@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Booking</title>
+
+    <link rel="stylesheet" href="https://www.rifugioscoiattoli.it/booking/css/main.css?v=7">    
+    <script type="text/javascript" src="https://www.rifugioscoiattoli.it/booking/js/jquery.js"></script>	
+    
+    <link rel="stylesheet" href="https://www.rifugioscoiattoli.it/booking/js/pickadate/themes/default.css?v2">
+    <link rel="stylesheet" href="https://www.rifugioscoiattoli.it/booking/js/pickadate/themes/default.date.css?v2">
+    <script type="text/javascript" src="https://www.rifugioscoiattoli.it/booking/js/pickadate/picker.js?v2"></script>	
+    <script type="text/javascript" src="https://www.rifugioscoiattoli.it/booking/js/pickadate/picker.date.js?v2"></script>	
+    <script type="text/javascript" src="https://www.rifugioscoiattoli.it/booking/js/pickadate/legacy.js?v2"></script>	
+  </head>
+  <body>    
+      
+    <div id="container">
+          
+        <img id="bookingLogo" src="https://www.rifugioscoiattoli.it/booking/images/rifugioscoiattoli.png" />
+      
+        <div id='riepilogo-step2'>   
+<p><b>Arrivo:</b> 12/01/2027</p><p><b>Partenza:</b> 13/01/2027</p><p><b>N. Adulti:</b> 2</p></div>    
+
+        <script type='text/javascript'>
+        
+        
+        numPersone          = 2;
+        postiSelezionati    = 0;
+
+        $(document).ready(function(){
+        
+            aggiornaSelezione();
+
+            $('.chk_id_camera,.sel_camerata').on('change',function(){
+                
+                aggiornaSelezione();
+
+            });
+            
+            $('form').submit(function() {
+            
+            
+
+                            if (postiSelezionati<numPersone) {
+                                alert("Hai selezionato meno posti di quelli richiesti!");
+                                return false;
+                            }
+                            
+                            if (numCamereSelezionate>numPersone) {
+                                alert("Non puoi selezionare più camere delle persone!");
+                                return false;
+                            }
+
+                    
+                
+            });
+
+
+        });
+        
+        aggiornaSelezione = function() {
+        
+            postiSelezionati        =   0;
+            numCamereSelezionate    =   $('.chk_id_camera:checked').length;
+            postiInCamerata         =   0;
+            
+            //cambio classe per la label delle stanze selezionate
+            $('.chk_id_camera').parent('label').removeClass('selezionata');
+            $('.chk_id_camera:checked').parent('label').addClass('selezionata');
+
+            $('.chk_id_camera:checked').each(function() {
+                postiSelezionati += Number( $(this).data('letti') );                
+            });
+
+            $('.sel_camerata').parent('label').removeClass('selezionata');
+            
+            $('.sel_camerata').each(function() {
+                var valoreSelect    = Number( $(this).val() );
+                postiSelezionati    += valoreSelect;
+                postiInCamerata     += valoreSelect;
+                if (valoreSelect) {
+                    $(this).parent('label').addClass('selezionata');
+                }
+            });
+            
+            if (postiSelezionati==0) {
+                $('#info').removeClass('utilizzato').html('');
+                return;
+            }
+
+            stampa =    "<p>Hai selezionato <b>" + numCamereSelezionate + " camere</b> ";
+            if (postiInCamerata>0)  stampa +=   " (e <b>" + postiInCamerata + " posti</b> in camerata) ";
+            stampa +=   "per un totale di <b>" + postiSelezionati + " posti</b> su " + numPersone + "  richiesti.";
+            
+            if (postiSelezionati>numPersone) {
+                stampa +=   "<br/>I letti non occupati avranno un costo di <b>15 &euro; per letto a notte</b>.";
+            }
+
+            $('#info').addClass('utilizzato').html(stampa);
+
+            //console.log(postiSelezionati);
+
+        };
+        
+    
+        </script>
+    <form method="get" action="" id="form_prenotazione" class="forms">
+
+
+
+        <input type="hidden" name="action" value="invia-step2" />
+        <input type="hidden" name="arrivo_unixtime" value="1799708400" />
+        <input type="hidden" name="partenza_unixtime" value="1799794800" />
+        <input type="hidden" name="nadulti" value="2" />
+        <input type="hidden" name="nbambini_3_12" value="0" />
+        <input type="hidden" name="nbambini_0_2" value="0" />
+
+        <div class='labelContainer'>
+
+    
+            <label class='labelCamerata'>
+              <img src="https://www.rifugioscoiattoli.it/booking/foto/camere/w150h200/20150118-143110.jpg" /> 
+
+
+                <p><b>Camerata 9</b></p>
+                <select name='id_camerata[1]' class='sel_camerata'>  
+<option value='0' >-</option> 
+<option value='1' >1 letti</option> 
+<option value='2' >2 letti</option> 
+<option value='3' >3 letti</option> 
+<option value='4' >4 letti</option> 
+<option value='5' >5 letti</option> 
+<option value='6' >6 letti</option> 
+<option value='7' >7 letti</option> 
+<option value='8' >8 letti</option> 
+                
+                </select>
+                <p class='descr'>
+                Camerata  da 10  letti a castello.  In queste stanze i posti vengano occupati tutti quindi ci si può ritrovare in camera con persone sconosciute
+Servizio di HB
+                    <br/><b>110.00 &euro; a notte a letto</b>
+                </p>
+            </label>
+        
+        </div>
+
+        <div id='info'>
+        </div>
+
+        <input type='submit' class='btn' value='Continua' />
+
+    </form>
+
+              
+        <div id="footer">
+            
+            <p>
+                <a href="https://www.rifugioscoiattoli.it/booking/">IT</a>
+                / <a href="https://www.rifugioscoiattoli.it/booking/eng/">EN</a>
+                / <a href="https://www.rifugioscoiattoli.it/booking/ted/">DE</a>
+            </p>
+            
+        </div>
+          
+    </div>
+      
+      
+  </body>
+</html>

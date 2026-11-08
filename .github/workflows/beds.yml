@@ -1,0 +1,57 @@
+name: cancellation-watch
+
+# Fast watch: beds for 2 on 22/23 June 2027 + Rifugio Nuvolau opening watch.
+# Nuvolau also gets a 1-minute probe job around 1 Feb (nuvolau-dense.yml).
+# GitHub may delay scheduled runs by 10-30 min (or skip some) when Actions is busy.
+on:
+  schedule:
+    - cron: "*/15 * * * *"                          # everything (keep first: fast.py FULL_TICK)
+    - cron: "5,10,20,25,35,40,50,55 * 15-31 12 *"   # Nuvolau only: 5-min ticks 15-31 Dec
+    - cron: "5,10,20,25,35,40,50,55 * * 1 *"        # Nuvolau only: 5-min ticks all January
+    - cron: "5,10,20,25,35,40,50,55 * 1-15 2 *"     # Nuvolau only: 5-min ticks 1-15 February
+  workflow_dispatch:
+    inputs:
+      test_alert:
+        description: "Send test pushes (ANNOUNCEMENT, OPENING, BEDS) + a TEST issue"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # commit state/beds.json, state/nuvolau.json
+  issues: write     # alert record
+  actions: write    # self-disable once no night is left to watch
+
+concurrency:
+  group: cancellation-watch
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -q -r requirements.txt
+      - name: Check availability
+        id: beds
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TEST_ALERT: ${{ inputs.test_alert }}
+          SCHEDULE: ${{ github.event.schedule }}
+          HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
+        run: python -m hutwatch fast
+      - name: Commit state
+        if: always()
+        run: scripts/commit_state.sh "cancellation-watch state $(date -u +%FT%TZ)" state/beds.json state/nuvolau.json state/nuvolau_opening.json
+      - name: Disable when every night is booked or past
+        if: steps.beds.outputs.all_done == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow disable beds.yml -R "$GITHUB_REPOSITORY"

@@ -1,0 +1,46 @@
+{
+  "entries": {
+    "2027-06-22/biella": {
+      "consecutive_failures": 0,
+      "detail": "fully booked on 22.06.2027 (0 of 47 beds free)",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    },
+    "2027-06-23/averau": {
+      "consecutive_failures": 0,
+      "detail": "no beds offered; calendar marks night unavailable (sold out or closed - Bukly does not distinguish)",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    },
+    "2027-06-23/colgallina": {
+      "consecutive_failures": 0,
+      "detail": "no beds offered; calendar marks night unavailable (sold out or closed - Bukly does not distinguish)",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    },
+    "2027-06-23/lagazuoi": {
+      "consecutive_failures": 0,
+      "detail": "not available (grey; site shows sold-out and closed alike). Green nights in June 2027: 7-10",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    },
+    "2027-06-23/scoiattoli": {
+      "consecutive_failures": 0,
+      "detail": "no places for 2; no nearby dates offered, waiting list offered",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    },
+    "2027-06-23/scotoni": {
+      "consecutive_failures": 0,
+      "detail": "no beds offered; calendar marks night unavailable (sold out or closed - Bukly does not distinguish)",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "full"
+    }
+  }
+}

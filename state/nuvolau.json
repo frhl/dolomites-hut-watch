@@ -1,0 +1,112 @@
+{
+  "entries": {
+    "2027-06-23/nuvolau": {
+      "consecutive_failures": 0,
+      "detail": "bookings disabled on site: 'Rooms closed, see you in June 2027!'",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "closed"
+    },
+    "2027-06-24/nuvolau": {
+      "consecutive_failures": 0,
+      "detail": "bookings disabled on site: 'Rooms closed, see you in June 2027!'",
+      "failure_alerted": false,
+      "last_error": null,
+      "status": "closed"
+    }
+  },
+  "opening": {
+    "consecutive_failures": 0,
+    "failure_alerted": false,
+    "last_detail": "bookings disabled: 'Rooms closed, see you in June 2027!'; June 2027 calendar fully blocked (30 nights, 0 free beds)",
+    "last_error": null
+  },
+  "pages": {
+    "https://rifugionuvolau.it/": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "7c62ab5663b26204d359ab20859c1f258b57f9f73d3662cc751d465f27cfb7a9",
+      "last_error": null,
+      "matches": [
+        "Prenotazioni 2027: a partire da gennaio 2027 sul sito web"
+      ],
+      "sentences": [
+        "Prenota",
+        "Prenota il tuo soggiorno",
+        "RIFUGIO CHIUSO.",
+        "Apertura stagionale solo estiva.",
+        "Apertura prevista dal 20 giugno al 20 settembre 2027",
+        "Prenotazioni 2027: a partire da gennaio 2027 sul sito web",
+        "Listino prezzi per la prossima stagione: scopri le condizioni di soggiorno nel cuore delle Dolomiti.",
+        "🔒 Camere chiuse 🔓 Dal 21 al 27 settembre rifugio",
+        "🥶 10 giugno 2026: eccoci alle prese con i santi de",
+        "🤯È un incubo per voi prenotare una notte al Rifugi",
+        "Camere aperte fino al 21 settembre.",
+        "(Attivo solo nei mesi di apertura!)",
+        "Privacy Policy | Cookie Policy | Condizioni di prenotazione | Aggiorna le preferenze sui cookie",
+        "Rifugio Nuvolau ©2026.",
+        "All rights reserved | Credits"
+      ]
+    },
+    "https://rifugionuvolau.it/dormire/": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "824a05b97a09ad56656211b40c63a339e1af48dcaee3fc57c420c60f55682527",
+      "last_error": null,
+      "matches": [
+        "Prenotazioni 2027: a partire da gennaio 2027 sul sito web"
+      ],
+      "sentences": [
+        "Prenota - Rifugio Nuvolau",
+        "Prenota",
+        "Prenota il tuo soggiorno",
+        "prenota ora",
+        "Informazioni Importanti per la prenotazione",
+        "RIFUGIO CHIUSO.",
+        "Apertura stagionale solo estiva.",
+        "Apertura prevista dal 20 giugno al 20 settembre 2027",
+        "Prenotazioni 2027: a partire da gennaio 2027 sul sito web",
+        "Al momento della prenotazione è possibile selezionare i posti letto e il trattamento preferito.",
+        "Segnalazioni o richieste particolari vanno indicate nelle “Note speciali” al momento della prenotazione.",
+        "Per motivi organizzativi, non sono accettate prenotazioni tramite agenzie.",
+        "Prenotazioni",
+        "Le prenotazioni possono essere effettuate esclusivamente tramite il sistema presente sul sito.",
+        "Per confermare la prenotazione è richiesto un acconto del 40% dell’importo totale.",
+        "Al momento della prenotazione è possibile scegliere il numero di posti letto e il trattamento preferito.",
+        "Il pagamento è gestito direttamente dal sito nella pagina di booking;",
+        "PRENOTA ORA",
+        "Prenota Ora",
+        "(Attivo solo nei mesi di apertura!)",
+        "Privacy Policy | Cookie Policy | Condizioni di prenotazione | Aggiorna le preferenze sui cookie",
+        "Rifugio Nuvolau ©2026.",
+        "All rights reserved | Credits"
+      ]
+    },
+    "https://rifugionuvolau.it/en/": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "6ded19cfa2a9d9901784a48016b124eb11a35b6012b2fce1d632fb46b919bf56",
+      "last_error": null,
+      "matches": [
+        "2027 reservations: possible starting January 2027 on our website"
+      ],
+      "sentences": [
+        "Booking",
+        "RIFUGIO CLOSED",
+        "Summer opening only.",
+        "Planning to open from June 20th to September 20th 2027",
+        "2027 reservations: possible starting January 2027 on our website",
+        "Price list for the upcoming season: discover the conditions for your stay in the heart of the Dolomites.",
+        "🔒 Camere chiuse 🔓 Dal 21 al 27 settembre rifugio",
+        "🥶 10 giugno 2026: eccoci alle prese con i santi de",
+        "🤯È un incubo per voi prenotare una notte al Rifugi",
+        "Camere aperte fino al 21 settembre.",
+        "Bookings",
+        "(Active only during opening months!)",
+        "Privacy Policy| Cookie Policy | Booking conditions | Update your cookie preferences",
+        "Rifugio Nuvolau ©2026.",
+        "All rights reserved | Credits"
+      ]
+    }
+  }
+}

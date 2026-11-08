@@ -1,0 +1,62 @@
+name: page-watch
+
+# Slow watch: 28 June 2027 huts (bookings opening) + change-watch fallbacks.
+on:
+  schedule:
+    - cron: "17 */4 * * *"   # every 4 h, off the hour
+  workflow_dispatch:
+    inputs:
+      test_alert:
+        description: "Send a test alert (GitHub issue + Telegram if configured)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write   # commit state/pages.json
+  issues: write     # alerts
+  actions: write    # self-disable after 2027-06-28
+
+concurrency:
+  group: page-watch
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    outputs:
+      expired: ${{ steps.date.outputs.expired }}
+    steps:
+      - id: date
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          today=$(TZ=Europe/Rome date +%F)
+          if [[ "$today" > "2027-06-28" ]]; then
+            echo "expired=true" >> "$GITHUB_OUTPUT"
+            echo "Past 2027-06-28: disabling this workflow."
+            gh workflow disable pages.yml -R "$GITHUB_REPOSITORY" || true
+          fi
+
+  check:
+    needs: guard
+    if: needs.guard.outputs.expired != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -q -r requirements.txt
+      - name: Check pages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TEST_ALERT: ${{ inputs.test_alert }}
+          HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
+        run: python -m hutwatch pages
+      - name: Commit state
+        if: always()
+        run: scripts/commit_state.sh "page-watch state $(date -u +%FT%TZ)" state/pages.json

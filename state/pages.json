@@ -1,0 +1,196 @@
+{
+  "last_run": {
+    "at": "2026-11-08T18:11:03+00:00",
+    "summary": [
+      "pian-de-fontana-cai: ok, 13 relevant sentences",
+      "pian-de-fontana-site: ok, 2 relevant sentences",
+      "pramperet-cai: ok, 14 relevant sentences",
+      "pramperet-site: ok, 0 relevant sentences",
+      "muntagnoles-info: ok, 4 relevant sentences",
+      "sennes-home: ok, 5 relevant sentences",
+      "sennes-contact: ok, 1 relevant sentences",
+      "cinque-torri-rooms: ok, 3 relevant sentences",
+      "cinque-torri-home: ok, 0 relevant sentences",
+      "capanna-alpina-info: ok, 13 relevant sentences"
+    ]
+  },
+  "pages": {
+    "capanna-alpina-info": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "490f328ea1f51c47c57642fb34f1aa2ff2e1aa243a56639863af1f4d8582a241",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [
+        "Books & tales",
+        "Book",
+        "During the Christmastime, dinners are available upon reservation from 6.30 pm to 8 pm.",
+        "Opening times",
+        "02.12.2026",
+        "14.12.2026",
+        "Open from",
+        "15.12.2026",
+        "23.12.2026",
+        "24.12.2026",
+        "26.12.2026",
+        "27.12.2026",
+        "04.04.2027"
+      ],
+      "url": "https://www.altabadia.org/en/info/restaurants/detail/gastronomy/restaurant-capanna-alpina",
+      "widget_markers": []
+    },
+    "cinque-torri-home": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [],
+      "url": "https://www.rifugio5torri.it/",
+      "widget_markers": []
+    },
+    "cinque-torri-rooms": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "662754ddb43a22239a82301326e74a00f85b876377defac2317a056c0a09fb20",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [
+        "L'estate 2027 è quasi al completo!",
+        "PREZZI e CONDIZIONI STAGIONE 2026",
+        "I pernottamenti sono disponibili solo durante la stagione estiva."
+      ],
+      "url": "https://www.rifugio5torri.it/rooms.html",
+      "widget_markers": []
+    },
+    "muntagnoles-info": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "101f846d8e248c5a827665d3c3bb727c70e5878bf929fda6b522f1a3ce3a453e",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [
+        "Fanes - Ücia dles Muntagnoles - Info - Reservations",
+        "Info - Reservations",
+        "Reservations",
+        "All Rights Reserved."
+      ],
+      "url": "https://www.muntagnoles.com/index.php/en/info-reservations-en",
+      "widget_markers": []
+    },
+    "pian-de-fontana-cai": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "c58e6d67878db39dfcf5bad339e169ec7ef8fbb2dc9e45757722ce43d1dfef13",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "open_matches": [],
+      "sentences": [
+        "Cerca e Prenota",
+        "close",
+        "Cerca e prenota",
+        "open_in_new",
+        "Prenotazione aggiunta al carrello",
+        "Prenota Rifugi è un’iniziativa promossa e sostenuta dal Club Alpino Italiano – CAI.",
+        "La piattaforma tecnologica e il servizio di prenotazione online sono gestiti da",
+        "Per assistenza sulle prenotazioni, sui pagamenti e sull’utilizzo della piattaforma Prenota Rifugi:",
+        "info.prenotarifugi@inera.it",
+        "Per informazioni sull’adesione a Prenota Rifugi, sulla registrazione della struttura e per assistenza nell’utilizzo del sistema:",
+        "assistenza.gestori@prenotarifugi.cai.it",
+        "Hai bisogno di assistenza sulla procedura di prenotazione online?",
+        "(Per info su disponibilità o modifiche e cancellazioni alle prenotazioni, leggi le FAQ o contatta il rifugio all’indirizzo email che trovi nella sua scheda)"
+      ],
+      "url": "https://www.prenotarifugi.cai.it/dettaglio/?id=5942",
+      "widget_markers": []
+    },
+    "pian-de-fontana-site": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "578baa0296658a70861d00715f0d5649720a4799f432e9616587792b05f70db8",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "open_matches": [],
+      "sentences": [
+        "Apertura/Open: Sabato 6 giugno 2026 / Saturday 6th June 2026",
+        "Chiusura/Closed: Mercoledì 30 settembre 2026 / Wednesday, September 30, 2026"
+      ],
+      "url": "http://www.piandefontana.it/",
+      "widget_markers": []
+    },
+    "pramperet-cai": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "223f05a46fd8a675218dcb6ddb2b29ca5259959be671b0fc1e3f6e729126508b",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "open_matches": [],
+      "sentences": [
+        "Cerca e Prenota",
+        "close",
+        "Cerca e prenota",
+        "open_in_new",
+        "Prenotazione aggiunta al carrello",
+        "da Forno di Zoldo-Pian da la Fòpa, 1210 m, ore 2.15-2.30 Difficoltà T: su carrozzabile (sentiero 523 - chiusa al traffico) per Pian di Palùi, Malga di Prampèr, con sentiero 523 a Pra de la Vedova;",
+        "Prenota Rifugi è un’iniziativa promossa e sostenuta dal Club Alpino Italiano – CAI.",
+        "La piattaforma tecnologica e il servizio di prenotazione online sono gestiti da",
+        "Per assistenza sulle prenotazioni, sui pagamenti e sull’utilizzo della piattaforma Prenota Rifugi:",
+        "info.prenotarifugi@inera.it",
+        "Per informazioni sull’adesione a Prenota Rifugi, sulla registrazione della struttura e per assistenza nell’utilizzo del sistema:",
+        "assistenza.gestori@prenotarifugi.cai.it",
+        "Hai bisogno di assistenza sulla procedura di prenotazione online?",
+        "(Per info su disponibilità o modifiche e cancellazioni alle prenotazioni, leggi le FAQ o contatta il rifugio all’indirizzo email che trovi nella sua scheda)"
+      ],
+      "url": "https://www.prenotarifugi.cai.it/dettaglio/?id=5925",
+      "widget_markers": []
+    },
+    "pramperet-site": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "open_matches": [],
+      "sentences": [],
+      "url": "https://www.rifugiosommarivaalpramperet.it/",
+      "widget_markers": []
+    },
+    "sennes-contact": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "5bccb75f4bbd7287ee188a894e8eef874b0c20c1aceb1f9c990ea5860580e973",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [
+        "Attention: Use payment button only after receiving our reservation confirmation!/h2>"
+      ],
+      "url": "https://www.sennes.com/en/contact/index.php",
+      "widget_markers": []
+    },
+    "sennes-home": {
+      "consecutive_failures": 0,
+      "failure_alerted": false,
+      "hash": "4a4b194e3c8b11e5500b61fe2530e2254b9e4683205f6accb2bd8bcbc5ed5119",
+      "last_checked": "2026-11-08T18:11:03+00:00",
+      "last_status": "ok (HTTP 200)",
+      "last_success": "2026-11-08T18:11:03+00:00",
+      "sentences": [
+        "Dezember 2026 – 6.",
+        "Jänner 2027",
+        "Jänner 2027 - 31.",
+        "März 2027",
+        "Juni 2027 – 10 Oktober 2026"
+      ],
+      "url": "https://www.sennes.com/",
+      "widget_markers": []
+    }
+  }
+}

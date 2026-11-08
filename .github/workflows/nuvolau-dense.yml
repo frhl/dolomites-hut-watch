@@ -1,0 +1,48 @@
+name: nuvolau-dense
+
+# Rifugio Nuvolau: 1-minute probe of the booking form around 1 Feb 2027 (last year the
+# June stage opened on 1 Feb). Each job loops ~3 h; the cron starts one every 3 h inside
+# the window (31 Jan 21:00 UTC - 3 Feb 00:00 UTC), and the script exits outside it.
+# 1 request per minute. Shares the OPENING lock with cancellation-watch, so only one
+# OPENING alert is ever sent. GitHub may start a job 10-30 min late.
+on:
+  schedule:
+    - cron: "0 21 31 1 *"
+    - cron: "0 0,3,6,9,12,15,18,21 1-2 2 *"
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "Test run: probe for this many minutes (ignores the date window)"
+        default: "3"
+
+permissions:
+  contents: write   # commit state/nuvolau_opening.json
+  issues: write
+
+concurrency:
+  group: nuvolau-dense
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 190
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -q -r requirements.txt
+      - name: Probe Nuvolau booking form every minute
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
+          DENSE_MINUTES: ${{ inputs.minutes }}
+        run: python -m hutwatch dense
+      - name: Commit state
+        if: always()
+        run: scripts/commit_state.sh "nuvolau-dense state $(date -u +%FT%TZ)" state/nuvolau_opening.json

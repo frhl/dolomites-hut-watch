@@ -1,0 +1,340 @@
+
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+
+<!-- Google tag (gtag.js) --> 
+<!-- Google tag (gtag.js) --> 
+
+	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rifugio Tissi - Rooms and Beds Availability</title>
+    <meta name="description" content=""/>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Mulish&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../Foundation/css/app.css" />
+    <link rel="stylesheet" href="../Foundation/css/foundation-datepicker.css" />
+    <link rel="stylesheet" href="../Foundation/css/foundation-icons.css" />
+    <link rel="stylesheet" href="../Foundation/css/personal.css" />
+</head>
+<body>
+<header>
+	<div class="grid-container">
+	<div class="grid-x grid-padding-x grid-padding-y hide-for-medium">
+		<div class="small-6 cell">
+			<a href="../index_en.php"><img src="../Images/logo200x100.png"/></a>
+		</div>
+		<div class="small-6 cell align-self-middle" align="right">
+<a  href="../index.php">| IT |</a>		</div>	
+	</div>
+</div>
+
+<div data-sticky-container>
+<div id="barraTop" data-sticky data-options="marginTop:0; stickyOn: small;" style="width:100%; z-index: +10;">	
+
+	<div class="grid-container">
+		<div class="grid-x" data-equalizer data-equalize-on="medium">
+			<div class="medium-3 cell hide-for-small-only" >
+				<a href="../index_en.php"><img src="../Images/logo200x100W.png" style="padding: 5px 0px 5px 0px;" /></a>
+			</div>
+			<div class="small-12 medium-9 cell align-self-middle">
+				<div class="title-bar" data-responsive-toggle="menu1" data-hide-for="medium">
+					<button class="menu-icon white" type="button" data-toggle="menu1"></button>
+					<div class="title-bar-title"></div>
+				</div>
+
+				<div class="top-bar" id="menu1">
+					<div class="top-bar-left hide-for-small-only">
+					    <ul class="dropdown menu" data-dropdown-menu>
+				        	<li><a href="#">RIFUGIO</a>
+				        		<ul class="vertical menu">
+<li><a href="p37-About-Rifugio-Tissi">About Rifugio Tissi</a></li><li><a href="p38-About-Us">About Us</a></li><li><a href="p42-How-to-Get-to-Rifugio-Tissi">How to Get to Rifugio Tissi</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="#">FACILITIES</a>
+				        		<ul class="vertical menu">
+<li><a href="p40-Rates">Rates</a></li><li><a href="p39-Warm-Hospitality-at-Rifugio-Tissi">Stay Overnight at the Mountain Hut</a></li><li><a href="p44-Booking-onlineFAQS">Booking online/FAQS</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="#">MOUNT CIVETTA</a>
+				        		<ul class="vertical menu">
+<li><a href="p41-The-History-of-Mount-Civetta">The History of Mount Civetta</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="immagini.php">GALLERY</a></li>
+					    </ul>
+					</div>
+						
+
+					<div class="top-bar-right hide-for-medium">
+						<ul class="vertical menu accordion-menu" data-accordion-menu>
+				        	<li><a href="#">RIFUGIO</a>
+				        		<ul class="vertical menu">
+<li><a href="p37-About-Rifugio-Tissi">About Rifugio Tissi</a></li><li><a href="p38-About-Us">About Us</a></li><li><a href="p42-How-to-Get-to-Rifugio-Tissi">How to Get to Rifugio Tissi</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="#">FACILITIES</a>
+				        		<ul class="vertical menu">
+<li><a href="p40-Rates">Rates</a></li><li><a href="p39-Warm-Hospitality-at-Rifugio-Tissi">Stay Overnight at the Mountain Hut</a></li><li><a href="p44-Booking-onlineFAQS">Booking online/FAQS</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="#">MOUNT CIVETTA</a>
+				        		<ul class="vertical menu">
+<li><a href="p41-The-History-of-Mount-Civetta">The History of Mount Civetta</a></li>									
+				        		</ul>
+							</li>
+				        	<li><a href="immagini.php">GALLERY</a></li>
+						</ul>
+					</div>						
+						
+					<div class="top-bar-right hide-for-small-only">
+<a  href="../index.php" style="color: white;">| IT |</a>					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+</div>
+</div>
+	<!--immagine hero-->
+	<div class="grid-x">
+		<div class="small-12 medium-12 cell"><div class="hero-section" style="background-image: url(../Images/Booking/h1.jpg);"><div class="hero-section-text"></div></div></div>
+	</div>
+	<!--FINE immagine hero-->
+
+	<!--box prenotazione-->
+	<form action="prenotazione1.php" method="post"  data-abide novalidate>
+		<input type="hidden" name="codAgenzia" value="0">
+		<div class="grid-container">
+			<div class="prenotaBgOr">
+				<div class="grid-x grid-margin-x">
+				    <div class="small-6 medium-3 cell">
+				        <input type="text" class="span2" value="" id="dpd1" name="arrivo" placeholder="Check in" width="50%" readonly="readonly" required>
+				        <span class="form-error">Required field</span>
+				    </div>
+				    <div class="small-6 medium-3 cell">
+				        <input type="text" class="span2" value="" id="dpd2" name="partenza" placeholder="Check out" readonly="readonly" required>
+				        <span class="form-error">Required field</span>
+				    </div>
+				    <div class="small-6 medium-3 cell">
+				        <input type="text" class="span2" value="" name="persone" placeholder="No. of people" required>
+				        <span class="form-error">Required field</span>
+				    </div>
+				    <div class="small-6 medium-3 cell">
+						<input type="submit" class="button alert expanded" value="Book now">
+				    </div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<!--FINE box prenotazione-->
+</header>
+
+<section>
+	<div class="grid-container">
+		<div class="grid-x grid-padding-y">
+			<div class="small-12 medium-12 cell">
+				<ul class="breadcrumbs">
+				    <li><a href="../index_en.php">Home</a></li>
+				    <li>
+				      <span class="show-for-sr">Current: </span>Rooms and Beds Availability 
+				    </li>
+				</ul>
+			</div>
+		</div>
+		<div class="grid-x grid-padding-x grid-padding-y">
+			<div class="medium-1 large-2 cell"></div>
+			<div class="small-12 medium-10 large-8 cell" align="center">
+				<h3>Available beds in real time</h3>
+				<!-- <p>Tra parentesi il totale dei posti disponibili</p>  -->
+				<p>Click on the dates to view details</p>
+			</div>
+			<div class="medium-1 large-2 cell"></div>
+		</div>		
+	</div>
+	<div class="grid-x">
+		<div class="small-12 medium-12 cell" align="center"></div>
+	</div>
+
+<div class="grid-container"><div class="grid-x grid-padding-y"><div class="small-12 medium-12 cell" align="center"><div class="boxTestoLato"><div class="disponibilita"><table align="center" width="100%" id="TabDisp"><tr><th align="center"><a href="?codAgenzia=0&prm=18&chm=-1#TabDisp"><</a></th><th colspan="5" align="center">June 2027</th><th align="center"><a href="?codAgenzia=0&prm=18&chm=1#TabDisp">></a></th></tr><tr><td>Mon</td><td>Tue</td><td>Wed</td><td>Thu</td><td>Fri</td><td>Sat</td><td>Sun</td></tr><tr><td> </td><td class="chiuso" valign="top">1</td><td class="chiuso" valign="top">2</td><td class="chiuso" valign="top">3</td><td class="chiuso" valign="top">4</td><td class="chiuso" valign="top">5</td><td class="chiuso" valign="top">6</td></tr><tr><td class="chiuso" valign="top">7</td><td class="chiuso" valign="top">8</td><td class="libero" valign="top"><a data-open="giorno-9" style="display:block; color:white;">9</a></td><div class="reveal" id="giorno-9" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-10" style="display:block; color:white;">10</a></td><div class="reveal" id="giorno-10" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 12 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-11" style="display:block; color:white;">11</a></td><div class="reveal" id="giorno-11" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-12" style="display:block; color:white;">12</a></td><div class="reveal" id="giorno-12" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-13" style="display:block; color:white;">13</a></td><div class="reveal" id="giorno-13" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 10 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div></tr><tr><td class="libero" valign="top"><a data-open="giorno-14" style="display:block; color:white;">14</a></td><div class="reveal" id="giorno-14" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-15" style="display:block; color:white;">15</a></td><div class="reveal" id="giorno-15" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 19 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 4 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-16" style="display:block; color:white;">16</a></td><div class="reveal" id="giorno-16" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 28 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 11 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-17" style="display:block; color:white;">17</a></td><div class="reveal" id="giorno-17" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 20 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-18" style="display:block; color:white;">18</a></td><div class="reveal" id="giorno-18" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 5 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 3 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-19" style="display:block; color:white;">19</a></td><div class="reveal" id="giorno-19" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 16 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 9 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-20" style="display:block; color:white;">20</a></td><div class="reveal" id="giorno-20" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 12 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 11 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div></tr><tr><td class="libero" valign="top"><a data-open="giorno-21" style="display:block; color:white;">21</a></td><div class="reveal" id="giorno-21" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 14 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 1 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 14 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-22" style="display:block; color:white;">22</a></td><div class="reveal" id="giorno-22" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Dormitory n. 5 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-23" style="display:block; color:white;">23</a></td><div class="reveal" id="giorno-23" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Private room with 1 bunk-beds<br /><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><i class="step fi-torso" style="font-size: 1rem;" title="N� max persone: 2"></i><hr></div><div class="dettagli">Room with 4 beds n. 17 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 10 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-24" style="display:block; color:white;">24</a></td><div class="reveal" id="giorno-24" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 11 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 4 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-25" style="display:block; color:white;">25</a></td><div class="reveal" id="giorno-25" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Dormitory n. 9 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-26" style="display:block; color:white;">26</a></td><div class="reveal" id="giorno-26" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 10 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 7 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-27" style="display:block; color:white;">27</a></td><div class="reveal" id="giorno-27" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 12 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 13 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div></tr><tr><td class="libero" valign="top"><a data-open="giorno-28" style="display:block; color:white;">28</a></td><div class="reveal" id="giorno-28" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 1 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 3 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-29" style="display:block; color:white;">29</a></td><div class="reveal" id="giorno-29" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 16 posti letto disponibili<hr></div><div class="dettagli">Dormitory n. 1 posti letto disponibili<hr></div><div class="dettagli">Dormitory, 16 beds, to reach it you must leave the hut, the restrooms are upstair, outside. n. 16 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div><td class="libero" valign="top"><a data-open="giorno-30" style="display:block; color:white;">30</a></td><div class="reveal" id="giorno-30" data-reveal><div style="text-align:center;"><p><b>TIPOLOGIE ALLOGGIO DISPONIBILI</b></p></div><div class="dettagli">Room with 4 beds n. 1 posti letto disponibili<hr></div><button class="close-button" data-close aria-label="Close modal" type="button"><span aria-hidden="true">&times;</span></button></div></tr></table></div><p>Legenda: <i class="step fi-stop" style="font-size: 1.2rem; color: #309232;"></i> available - <i class="step fi-stop" style="font-size: 1.2rem; color: #c4c4c4;"></i> not available</p></div></div></div></div>
+</section>
+
+<div id="footer">
+
+<div class="grid-container">
+	<div class="grid-x grid-padding-x grid-padding-y">
+		<div class="small-12 medium-6 cell">
+			<p>Rifugio Tissi<br />
+			località Col Reàn m 2.250<br />
+			I-32022 Alleghe - BL<br />
+			Phone +39 0437 721644 - +39 347 593 1833</p>
+			<p>P.I. 00896210259<br />
+			CIN: IT025003B8P4Q7L275</p>
+		</div>
+
+		<div class="medium-6 cell hide-for-small-only" align="right">
+			<p>CONTACTS</p>
+			<p>
+			E-mail: <a href="mailto:rifugio.tissi@gmail.com">rifugio.tissi@gmail.com</a><br />
+			<a href="#" data-open="Privacy">Privacy Policy</a><br />
+			<a href="#" data-open="condizioni">Cancellation Policy</a>
+			</p>
+		</div>
+		<div class="small-12 cell hide-for-medium">
+			<p>CONTACTS</p>
+			<p>
+			E-mail: <a href="mailto:rifugio.tissi@gmail.com">rifugio.tissi@gmail.com</a><br />
+			<a href="#" data-open="Privacy">Privacy Policy</a><br />
+			<a href="#" data-open="condizioni">Cancellation Policy</a>
+			</p>
+		</div>
+	</div>
+</div>
+		
+
+	<div id="Privacy" class=" small reveal" data-reveal>
+	  <h2>Privacy Policy & Cookie Policy</h2>
+	  <p class="lead">PRIVACY POLICY IN ACCORDANCE WITH ARTICLES 13, 14 OF THE GDPR (GENERAL DATA PROTECTION REGULATION) 2016/679</p>
+<p>In compliance with the GDPR, your personal data will be processed according to the principles of fairness, lawfulness, transparency, and protection of your privacy and individual rights.</p>
+
+<p><b>Holder and Controller of Personal Data Processing:</b><br />
+Holder of Personal Data Processing is Rifugio Attilio Tissi di Bellenzier e C. S.n.c (below Rifugio Tissi) located on Via Piniè, 10 – 32022 Alleghe</p>
+
+<p><b>What data we collect</b><br />
+On booking, you are asked to provide your first name and family name, your phone number, your email address, and your credit card details.</p>
+
+<p><b>Purposes of Personal Data Processing. Why we collect your data.</b><br />
+A. Your personal data is used to finalize and manage your booking.
+Data concerning payment are utilized as collateral for the reservation or for the collection of deposit. (See the Cancellation Policy)<br />
+B. Direct Marketing activities: we may use your email address to deliver information and offers. At any time, you may unsubscribe to stop receiving marketing communication by simply following the unsubscribe instructions contained in our newsletters.</p>
+
+<p><b>Legal Basis for the Processing of your Personal Data</b><br />
+As to Purpose A, Rifugio Tissi utilizes as the legal basis for processing your personal data the need to implement  the contract, specifically to finalize and manage your booking. 
+Failure to provide your personal data, Rifugio Tissi cannot provide the service required.<br />
+As to Purpose B, in the case your email address provided on booking is utilized, Rifugio Tissi  pursues the legitimate commercial interest to provide their services. When personal data are used for legitimate interest, Rifugio Tissi will balance your rights and the protection of your personal rights against the rights and legitimate interest of Rifugio Tissi.</p>
+
+<p><b>Sharing and Disclosing Personal Information</b><br /> 
+We do not share with nor disclose to third parties any personal data you will provide us.</p>
+
+<p><b>Protection of personal data. Processing Methods</b><br />
+We have implemented  adequate and suitable technical and organizational measures to safeguard and protect your personal data. Such measures take into consideration the state-of-the-art of the IT system, implementation costs, the nature of personal data, and the risks around processing personal data. The purpose is to protect your personal data against accidental or unlawful damage, destruction, or loss, unauthorized disclosure or access, and other forms of unlawful processing.<br />
+In addition, we collect and process your personal data when it is adequate, relevant, and not excessive, as required to comply with the above mentioned purposes; we ensure that your personal data are updated and accurate.<br />
+Besides the Holder, under some circumstances,  third party entities may have access to your personal data, either internally when  involved in the development of our website (administration, marketing, legal entities or service providers) or externally (third party providers of technical services, hosting provider). Whenever needed, the Holder will name these entities as Controllers.</p>
+
+<p><b>Storage of Personal Data</b><br /> 
+For the Purposes of Point A, your personal data will be stored for the period of the contract and further on  as necessary to comply with our legal and tax obligations. After this period, your personal data will be deleted from our systems.<br />
+Credit card details, instead, will be stored until payment for the service is submitted and destroyed immediately after.<br />
+For the Purposes of Points B and C, your personal data will be retained as long as you  withdraw your consent to processing or object to us using your email address for direct marketing activities (See below the "Your Rights" chapter)</p>
+
+<p><b>Your Rights</b><br />
+The GDPR provides the following rights for data subjects:<br />
+- The right to rectification: you may require the Controller to rectify any errors in your personal data.<br />
+- The right to restrict processing: you may require a restriction of personal data processing when you contest the accuracy of your personal data, or in case of unlawful processing, or if you object to the processing.<br />
+- The right of access: at any time and free of charge you may require the Controller to provide information on your personal data (concerning you), including information on the categories of personal data concerned, the purposes of our processing, and the possible recipients we may have disclosed your personal data.<br />
+- The right to data portability: you may require the controller to transmit your personal data to another controller, if this is technically feasible  and  provided that the processing of your personal data is based on your consent or is necessary for the performance of a contract.<br />
+- The right to erasure: you may require the controller to delete your data when:<br />
+a) personal data is no longer necessary for the purpose for which it was originally collected or processed;<br />
+b) you withdraw consent to processing<br />
+c) you object to processing and there is  no overriding legitimate grounds for continuing the processing<br />
+d) the data have been processed unlawfully<br />
+The right to erasure will not apply if the processing is necessary to comply with a legal obligation or for the establishment, exercise or defence of legal claims. <br />
+- The right to object: at any time you may object to the processing of your personal data for direct marketing purposes (Points B and C of this Policy) . In this case your personal data will no longer be processed for these purposes. Should you decide to exercise this right, please let us know whether you wish to delete your personal data or restrict  their processing.</p>
+
+<p>You may exercises these rights or obtain further information by emailing: <a href="mailto:info@rifugiotissi.com">info@rifugiotissi.com</a></p>
+	  
+	  <p class="lead">Use of cookies and log files</p>
+			<h5>Information on Cookies</h5>
+<p>This Website does not use their own or third party cookies</p>
+
+	  <button class="close-button" data-close aria-label="Close modal" type="button">
+	    <span aria-hidden="true">&times;</span>
+	  </button>
+	</div>
+
+<div id="condizioni" class="small reveal" data-reveal>
+  <h2>Cancellation Policy</h2>
+<p><strong>Cancellation Policy:</strong></p>
+
+<ul>
+	<li><strong>at the time of booking, Rifugio Tissi requires a&nbsp;&euro;20.00 deposit per person;</strong></li>
+	<li><strong>the deposit is&nbsp;non-refundable&nbsp;under any circumstances;</strong></li>
+	<li><strong>in the event of cancellation within&nbsp;30 days prior to the reservation date, or in the case of a&nbsp;no-show, the&nbsp;full amount of the reservation&nbsp;will be charged;</strong></li>
+	<li><strong>for travel agencies, the cancellation policy communicated by email shall apply.</strong></li>
+</ul>
+  <button class="close-button" data-close aria-label="Close modal" type="button">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+</div>
+
+
+    <script src="../Foundation/js/app.js"></script>
+    <script src="../Foundation/js/jquery.min.js"></script>
+    <script src="../Foundation/js/foundation-datepicker.js"></script>
+    <script src="../Foundation/js/foundation-datepicker.it.js"></script>
+    <script src="../Foundation/js/foundation.min.js"></script>
+
+    <script>
+      $(document).foundation();
+
+$(document).ready(function() {
+
+    $(window).scroll(function() {
+
+        var height = $('.headerMenu').height();
+        var scrollTop = $(window).scrollTop();
+
+        if (scrollTop >= height - 40) {
+            $('.sfondoTras').addClass('sfondoScuro');
+        } else {
+            $('.sfondoTras').removeClass('sfondoScuro');
+        }
+
+    });
+});
+
+
+var nowTemp = new Date();
+//var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+var checkin = $('#dpd1').fdatepicker({
+	language: 'en',
+	format: 'dd-mm-yyyy',
+	leftArrow:'<<',
+	rightArrow:'>>',
+	closeIcon:'X',
+	closeButton: true,
+	onRender: function (date) {
+		return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	}
+}).on('changeDate', function (ev) {
+	if (ev.date.valueOf() > checkout.date.valueOf()) {
+		var newDate = new Date(ev.date)
+		newDate.setDate(newDate.getDate() + 1);
+		checkout.update(newDate);
+	}
+	checkin.hide();
+	$('#dpd2')[0].focus();
+}).data('datepicker');
+var checkout = $('#dpd2').fdatepicker({
+	language: 'en',
+	format: 'dd-mm-yyyy',
+	leftArrow:'<<',
+	rightArrow:'>>',
+	closeIcon:'X',
+	closeButton: true,
+	onRender: function (date) {
+		return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+	}
+}).on('changeDate', function (ev) {
+	checkout.hide();
+}).data('datepicker');
+
+    </script>
+
+	
+</body>	
+</html>
