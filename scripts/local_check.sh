@@ -13,11 +13,11 @@ mkdir -p "$STATE"
 now=$(date +%s)
 last=$(cat "$STATE/last_run" 2>/dev/null || echo 0)
 if [ $((now - last)) -lt 3540 ]; then
-  echo "$(date -u +%FT%TZ) skipped: last run $((now - last)) s ago"
+  echo "Dolomites Hut Watch $(date -u +%FT%TZ): skipped, last run $((now - last)) s ago"
   exit 0
 fi
 echo "$now" > "$STATE/last_run"
-echo "=== $(date -u +%FT%TZ)"
+echo "=== Dolomites Hut Watch (Booking Suedtirol check) $(date -u +%FT%TZ)"
 
 # Pick up code (public repo) and tracker (private state repo, ./private) updates, but only
 # if a clone has no local edits.

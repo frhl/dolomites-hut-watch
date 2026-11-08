@@ -1,20 +1,38 @@
 #!/bin/bash
-# Install the hourly Booking Suedtirol check on this Mac (launchd user agent).
-#   scripts/install_launchd.sh               asks for the ntfy topic (input hidden), installs, runs once
-#   scripts/install_launchd.sh --uninstall   removes it (keeps ~/.config/hutwatch)
-#   scripts/install_launchd.sh --print-plist prints the plist only
+# Install the hourly Mac check (Booking Suedtirol huts: Fanes, Lavarella, Pederue, Fodara
+# Vedla - their booking API refuses GitHub's servers, so this one check runs from your Mac).
+#
+# It shows up as "Dolomites Hut Watch": a small app in ~/Applications whose launcher runs
+# scripts/local_check.sh, so System Settings > Login Items and Activity Monitor show that
+# name instead of "bash".
+#
+#   scripts/install_launchd.sh               asks for the ntfy topic once (input hidden), installs, runs once
+#   scripts/install_launchd.sh --uninstall   removes the job and the app (keeps ~/.config/hutwatch)
+#   scripts/install_launchd.sh --print-plist prints the launchd plist only
 set -euo pipefail
-LABEL="com.hutwatch.booking-suedtirol"
+NAME="Dolomites Hut Watch"
+LABEL="com.frhl.dolomites-hut-watch"
+OLD_LABELS=("com.hutwatch.booking-suedtirol")
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
+APP="$HOME/Applications/$NAME.app"
+EXE="$APP/Contents/MacOS/$NAME"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 CONF="$HOME/.config/hutwatch"
-LOG="$HOME/Library/Logs/hutwatch-local.log"
+LOG="$HOME/Library/Logs/dolomites-hut-watch.log"
 DOMAIN="gui/$(id -u)"
+LSREGISTER=/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister
+
+remove_agent() {  # $1 = label
+  launchctl bootout "$DOMAIN/$1" 2>/dev/null || true
+  rm -f "$HOME/Library/LaunchAgents/$1.plist"
+}
 
 if [ "${1:-}" = "--uninstall" ]; then
-  launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
-  rm -f "$PLIST"
-  echo "Removed $LABEL."
+  remove_agent "$LABEL"
+  for l in "${OLD_LABELS[@]}"; do remove_agent "$l"; done
+  [ -d "$APP" ] && "$LSREGISTER" -u "$APP" 2>/dev/null || true
+  rm -rf "$APP"
+  echo "Removed $NAME ($LABEL)."
   exit 0
 fi
 
@@ -31,8 +49,11 @@ cat <<PL
 <plist version="1.0">
 <dict>
   <key>Label</key><string>$LABEL</string>
+  <key>Program</key><string>$EXE</string>
   <key>ProgramArguments</key>
-  <array><string>/bin/bash</string><string>$REPO/scripts/local_check.sh</string></array>
+  <array><string>$EXE</string><string>$REPO/scripts/local_check.sh</string></array>
+  <key>AssociatedBundleIdentifiers</key>
+  <array><string>$LABEL</string></array>
   <key>EnvironmentVariables</key>
   <dict>
     <key>HUTWATCH_PYTHON</key><string>$PY</string>
@@ -50,11 +71,14 @@ PL
 
 if [ "${1:-}" = "--print-plist" ]; then plist; exit 0; fi
 
-if [ ! -d "$REPO/private/.git" ]; then  # tracker lives in the private state repo
+# The tracker lives in the private state repo.
+if [ ! -d "$REPO/private/.git" ]; then
   git clone -q https://github.com/frhl/dolomites-hut-watch-state.git "$REPO/private" \
     || echo "warn: could not clone the private state repo; the tracker will be missing"
 fi
-mkdir -p "$CONF" "$HOME/Library/LaunchAgents" "$(dirname "$LOG")"
+
+# ntfy topic, stored once with owner-only permissions.
+mkdir -p "$CONF" "$HOME/Library/LaunchAgents" "$(dirname "$LOG")" "$HOME/Applications"
 chmod 700 "$CONF"
 if [ ! -s "$CONF/ntfy_topic" ]; then
   T="${NTFY_TOPIC:-}"
@@ -64,9 +88,39 @@ if [ ! -s "$CONF/ntfy_topic" ]; then
 fi
 chmod 600 "$CONF/ntfy_topic"
 
+# Build the named app: Contents/MacOS/<NAME> launcher + Info.plist (background-only).
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS"
+clang -O2 -Wall -o "$EXE" -DHUTWATCH_SCRIPT="\"$REPO/scripts/local_check.sh\"" "$REPO/scripts/mac/launcher.c"
+cat > "$APP/Contents/Info.plist" <<IP
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleIdentifier</key><string>$LABEL</string>
+  <key>CFBundleName</key><string>$NAME</string>
+  <key>CFBundleDisplayName</key><string>$NAME</string>
+  <key>CFBundleExecutable</key><string>$NAME</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleShortVersionString</key><string>1.0</string>
+  <key>CFBundleVersion</key><string>1</string>
+  <key>LSBackgroundOnly</key><true/>
+  <key>NSHumanReadableCopyright</key><string>Hourly Booking Suedtirol check for the Alta Via 1 hut watch (alert only).</string>
+</dict>
+</plist>
+IP
+codesign --force --sign - "$APP" >/dev/null 2>&1 || echo "warn: ad-hoc codesign failed (the app still runs)"
+"$LSREGISTER" -f "$APP" 2>/dev/null || true
+
+# Replace any older job, then load this one.
+for l in "${OLD_LABELS[@]}"; do remove_agent "$l"; done
+if [ -f "$HOME/Library/Logs/hutwatch-local.log" ] && [ ! -f "$LOG" ]; then
+  mv "$HOME/Library/Logs/hutwatch-local.log" "$LOG"
+fi
 plist > "$PLIST"
 plutil -lint "$PLIST" >/dev/null
 launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
 launchctl bootstrap "$DOMAIN" "$PLIST"
-echo "Installed $LABEL: runs hourly (and now). Python: $PY"
+echo "Installed \"$NAME\" ($LABEL): runs hourly (and now). Python: $PY"
+echo "App: $APP"
 echo "Log: $LOG    Uninstall: $0 --uninstall"

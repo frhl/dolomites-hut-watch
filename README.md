@@ -66,7 +66,11 @@ hut and event type. With issues off, run logs record only an alert's title, neve
    ```bash
    ~/Projects/dolomites/tracker/scripts/install_launchd.sh
    ```
-   Log: `~/Library/Logs/hutwatch-local.log`. Remove: `scripts/install_launchd.sh --uninstall`.
+   It appears as **Dolomites Hut Watch** (System Settings > General > Login Items > Allow in
+   the Background, and in Activity Monitor for ~10 s while a check runs): a small app in
+   `~/Applications` whose launcher runs `scripts/local_check.sh`. launchd label
+   `com.frhl.dolomites-hut-watch`. Log: `~/Library/Logs/dolomites-hut-watch.log`.
+   Remove: `scripts/install_launchd.sh --uninstall`.
    It runs only while the Mac is awake and online; 3 failed hours in a row (e.g. offline)
    give a `FAILING` push. It pulls the repo before each run if the clone has no local edits,
    so tracker updates reach it.
