@@ -72,8 +72,12 @@ class Notifier:
         Returns the issue/comment URL. Raises http.FetchError on failure.
         """
         title, body = scrub(title), scrub(body[:60_000] + self._cc())
-        if self.dry_run or not self.issues_on:
+        if self.dry_run:
             print(f"\n=== [issue{' comment' if comment_only else ''}] {title}\n{body}\n")
+            return None
+        if not self.issues_on:
+            # Logs of a public repo are public: record that an alert happened, not its content.
+            print(f"[issue alert not posted: issues off] {title}")
             return None
         idx = self._issue_index()
         if title in idx:

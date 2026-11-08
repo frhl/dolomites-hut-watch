@@ -127,3 +127,16 @@ class Leaks(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class IssuesOff(unittest.TestCase):
+    def test_body_not_logged_when_issues_off(self):
+        env = {"GITHUB_TOKEN": "t" * 10, "GITHUB_REPOSITORY": "me/repo", "HUTWATCH_ISSUES": "off"}
+        with mock.patch.dict(os.environ, env), \
+                mock.patch.object(http, "request", side_effect=AssertionError("no API call")):
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                n = Notifier()
+                self.assertIsNone(n.issue("BEDS: X 23 Jun 2027", "SECRET BODY with phone and details"))
+        self.assertIn("BEDS: X 23 Jun 2027", out.getvalue())
+        self.assertNotIn("SECRET BODY", out.getvalue())
