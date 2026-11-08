@@ -4,7 +4,26 @@ Personal monitor for Alta Via 1 hut beds, summer 2027, 2 guests. **Alert only**:
 books, submits booking/enquiry forms or pays. Every request uses an honest User-Agent
 (`hutwatch/http.py`), a 20 s timeout and no retries; nothing tries to get past bot protection.
 
-What each hut is checked with, and which huts fall back to page-change detection: [STATUS.md](STATUS.md).
+How each hut is checked: [CHECKERS.md](CHECKERS.md). Whether the checks are running:
+[STATUS.md](STATUS.md) (run times and OK/FAILING only).
+
+## What is public, what is private
+
+This repo is public, so nothing in it, its Actions logs or its commit history reveals
+availability:
+
+- Run logs and job summaries print only `checked <hut>: ok | FAIL (<reason>)`.
+- Results, page text, alert timers, failure details and the tracker live in the private repo
+  `frhl/dolomites-hut-watch-state`, checked out at `./private` (git-ignored here) with a
+  deploy key (secret `STATE_DEPLOY_KEY`). Every job commits there every run.
+- The only public commit is page-watch's regenerated STATUS.md (every 4 h; also the
+  keep-alive that stops GitHub disabling the schedules after 60 days). It depends only on run
+  times and failure counters.
+- GitHub issues are off (`HUTWATCH_ISSUES=off`); alerts go to ntfy only.
+- `tests/test_public_output.py` checks that the public log, summary and STATUS.md are
+  byte-identical whether huts are full or have beds (with every alert type firing).
+- Alert-delivery errors don't turn a run red (that would give an alert away); undelivered
+  alerts are retried next run and the error is written to `state/last_errors.json` (private).
 
 ## Where the checks run
 
@@ -54,13 +73,13 @@ hut and event type. With issues off, run logs record only an alert's title, neve
 
 ## Tracker
 
-The repo holds a **sanitized** copy, `AV1-booking-tracker.xlsx`: sheet `Nights`, columns
-Night / Plan / Backup / Place / Status / Phone, only the nights the watches use. Make it
-from your full tracker and commit it:
+`AV1-booking-tracker.xlsx` lives in the **private** state repo (sheet `Nights`: a header row
+with `Night`, `Place`, `Status`, `Phone`; other columns and sheets are ignored). Replace it with
+your working copy and push:
 
 ```bash
-python3 scripts/sanitize_tracker.py ~/Downloads/AV1-booking-tracker.xlsx
-git commit -am "Update tracker" && git push
+cp ~/Downloads/AV1-booking-tracker.xlsx ~/Projects/dolomites/tracker/private/
+git -C ~/Projects/dolomites/tracker/private commit -am "Update tracker" && git -C ~/Projects/dolomites/tracker/private push
 ```
 
 - Mark **any** place for a night `Booked` and that night stops being checked by every watch.
@@ -68,7 +87,7 @@ git commit -am "Update tracker" && git push
   preferred hut, use another status (e.g. "Holding").
 - The tracker's `Phone` for that hut and night goes into the BEDS push.
 - Huts are matched by name (accents/case ignored): `aliases` in `hutwatch/beds_config.py`.
-- If the tracker can't be read, everything is checked and a `FAILING: tracker unreadable` alert is raised.
+- If the tracker can't be read, everything is checked and a `FAILING: tracker unreadable` push is sent.
 
 ## Stopping
 
@@ -84,15 +103,16 @@ Rifugio Tissi works with `disponibilita_php` and `params={"url": "https://www.ri
 
 ## State
 
-`state/*.json` is committed back by the workflows (hashes and extracted sentences for diffs,
-last results, failure counters, alert times, the Nuvolau OPENING lock). Page-watch commits
-every run, which also keeps scheduled workflows from being auto-disabled after 60 days.
-The Mac job keeps its state in `~/Library/Application Support/hutwatch/`.
+In the private repo under `state/`: `pages.json`, `beds.json`, `nuvolau.json` (results,
+extracted page text for diffs, failure counters, alert times), `nuvolau_opening.json`
+(the shared OPENING lock), `nuvolau_dense.json`, `last_errors.json`. The Mac job keeps
+its own state in `~/Library/Application Support/hutwatch/` and logs details locally.
 
 ## Local use
 
 ```bash
 pip install -r requirements.txt
+gh repo clone frhl/dolomites-hut-watch-state private   # state + tracker (private)
 python -m unittest discover -s tests -v
 python -m hutwatch pages --dry-run              # print alerts instead of sending
 python -m hutwatch fast --dry-run --only fanes nuvolau

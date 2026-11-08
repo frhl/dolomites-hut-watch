@@ -20,7 +20,7 @@ class Recorder:
     def issue(self, title, body, comment_only=False):
         self.issues.append((title, comment_only))
 
-    def ntfy(self, title, message, priority=4, click=None, phone=None, tags=None):
+    def ntfy(self, title, message, priority=4, click=None, phone=None, tags=None, **kw):
         self.pushes.append((title, priority, click, phone))
         return True
 
@@ -126,12 +126,23 @@ class BedsRun(unittest.TestCase):
 
 
 class TrackerFile(unittest.TestCase):
-    def test_reads_real_tracker(self):
-        rows = tracker.load()
+    def test_reads_tracker_layout(self):
+        import openpyxl
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Nights"
+        ws.append(["Alta Via 1: where we sleep"])          # title rows above the header, like the real one
+        ws.append(["Night", "Plan / Backup", "Place", "Status", "Phone", "Notes"])
+        ws.append([dt.datetime(2027, 6, 22), "Plan", "Rifugio Fanes", "Enquiry needed", "+39 0474 453001", "x"])
+        ws.append([dt.datetime(2027, 6, 22), "Backup", "Berggasthaus Pederü", "Not checked", None, None])
+        ws.append([dt.datetime(2027, 6, 23), "Backup", "Rifugio Lagazuoi", "Full", None, None])
+        with tempfile.TemporaryDirectory() as d:
+            path = Path(d) / "t.xlsx"
+            wb.save(path)
+            rows = tracker.load(path)
         fanes = tracker.find(rows, N22, ["Rifugio Fanes"])
-        self.assertIsNotNone(fanes)
         self.assertEqual(fanes.phone, "+39 0474 453001")
-        self.assertIsNotNone(tracker.find(rows, N22, ["Pederü"]))
+        self.assertIsNotNone(tracker.find(rows, N22, ["Pederu"]))        # accents ignored
         self.assertIsNotNone(tracker.find(rows, dt.date(2027, 6, 23), ["Lagazuoi"]))
 
     def test_booked_detection(self):
@@ -171,11 +182,13 @@ class BlockedOnCi(unittest.TestCase):
             self.assertEqual(calls, [1])
 
 
-class RepoTrackerIsSanitized(unittest.TestCase):
-    def test_only_allowed_sheet_and_columns(self):
-        import openpyxl
-        wb = openpyxl.load_workbook(tracker.DEFAULT_PATH)
-        self.assertEqual(wb.sheetnames, ["Nights"])
-        header = [c.value for c in wb["Nights"][1]]
-        self.assertEqual(header, ["Night", "Plan / Backup", "Place", "Status", "Phone"])
-        self.assertIn(wb.properties.creator, (None, "hutwatch", "openpyxl"))
+class NothingPrivateInPublicTree(unittest.TestCase):
+    """State and tracker live in the private repo (./private, git-ignored)."""
+
+    def test_defaults_point_into_private(self):
+        root = Path(tracker.__file__).resolve().parent.parent
+        self.assertEqual(tracker.DEFAULT_PATH.parent, root / "private") if not \
+            __import__("os").environ.get("HUTWATCH_TRACKER") else None
+        self.assertFalse((root / "AV1-booking-tracker.xlsx").exists())
+        self.assertFalse((root / "state").exists())
+        self.assertIn("private/", (root / ".gitignore").read_text().split())

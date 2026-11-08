@@ -16,8 +16,10 @@ on:
         type: boolean
         default: false
 
+# Public logs show only "checked <hut>: ok|FAIL"; state goes to the private state repo.
+# This workflow never commits to the public repo.
 permissions:
-  contents: write   # commit state/beds.json, state/nuvolau.json
+  contents: read
   issues: write     # alert record
   actions: write    # self-disable once no night is left to watch
 
@@ -31,6 +33,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Check out private state repo
+        uses: actions/checkout@v4
+        with:
+          repository: frhl/dolomites-hut-watch-state
+          ssh-key: ${{ secrets.STATE_DEPLOY_KEY }}
+          path: private
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -45,11 +53,12 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TEST_ALERT: ${{ inputs.test_alert }}
           SCHEDULE: ${{ github.event.schedule }}
+          HUTWATCH_PUBLIC_LOG: "1"
           HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
         run: python -m hutwatch fast
-      - name: Commit state
+      - name: Commit private state
         if: always()
-        run: scripts/commit_state.sh "cancellation-watch state $(date -u +%FT%TZ)" state/beds.json state/nuvolau.json state/nuvolau_opening.json
+        run: scripts/commit_state.sh private "cancellation-watch $(date -u +%FT%TZ)" state
       - name: Disable when every night is booked or past
         if: steps.beds.outputs.all_done == 'true'
         env:

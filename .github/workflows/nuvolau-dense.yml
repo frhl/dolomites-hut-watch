@@ -16,7 +16,7 @@ on:
         default: ""
 
 permissions:
-  contents: write   # commit state/nuvolau_opening.json
+  contents: read    # state goes to the private state repo
   issues: write
 
 concurrency:
@@ -29,6 +29,12 @@ jobs:
     timeout-minutes: 190
     steps:
       - uses: actions/checkout@v4
+      - name: Check out private state repo
+        uses: actions/checkout@v4
+        with:
+          repository: frhl/dolomites-hut-watch-state
+          ssh-key: ${{ secrets.STATE_DEPLOY_KEY }}
+          path: private
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -40,9 +46,10 @@ jobs:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          HUTWATCH_PUBLIC_LOG: "1"
           HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
           DENSE_MINUTES: ${{ inputs.minutes }}
         run: python -m hutwatch dense
-      - name: Commit state
+      - name: Commit private state
         if: always()
-        run: scripts/commit_state.sh "nuvolau-dense state $(date -u +%FT%TZ)" state/nuvolau_opening.json
+        run: scripts/commit_state.sh private "nuvolau-dense $(date -u +%FT%TZ)" state

@@ -6,13 +6,16 @@ Expected header row (found by scanning, not by position): Night, Place, Status, 
 from __future__ import annotations
 
 import datetime as dt
+import os
 import re
 import sys
 import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
-DEFAULT_PATH = Path(__file__).resolve().parent.parent / "AV1-booking-tracker.xlsx"
+# The tracker lives in the private state repo (checked out at ./private).
+DEFAULT_PATH = Path(os.environ.get("HUTWATCH_TRACKER") or
+                    Path(__file__).resolve().parent.parent / "private" / "AV1-booking-tracker.xlsx")
 SHEET = "Nights"
 
 

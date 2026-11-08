@@ -8,7 +8,7 @@ import urllib.parse
 from . import detect, http, state, tracker
 from .extract import extract
 from .notify import Notifier
-from .redact import log
+from .redact import log, plog, reason
 from .pagewatch_config import EMAIL_BODY, EMAIL_SUBJECT, HUTS, PAGES, STOP_AFTER, hut
 
 STATE_FILE = state.STATE_DIR / "pages.json"
@@ -71,11 +71,13 @@ def run(notifier: Notifier, test_alert: bool = False) -> int:
         h = hut(page.hut)
         if today > h.night:
             summary.append(f"{page.id}: skipped (night {h.night} passed)")
+            plog(f"checked {page.id}: not checked (night no longer watched)")
             continue
         if rows is not None:
             booked = tracker.night_booked(rows, h.night)
             if booked:
                 summary.append(f"{page.id}: skipped ({booked.place} marked Booked for {h.night})")
+                plog(f"checked {page.id}: not checked (night no longer watched)")
                 continue
         old = pages_st.get(page.id, {})
         new = dict(old)
@@ -97,6 +99,7 @@ def run(notifier: Notifier, test_alert: bool = False) -> int:
                                f"Last error: `{e}`\n\nThe monitor keeps trying every run.", False))
                 new["failure_alerted"] = True
             summary.append(f"{page.id}: FAIL ({n}x) {e}")
+            plog(f"checked {page.id}: FAIL ({reason(e)})")
         else:
             if old.get("failure_alerted"):
                 events.append((f"FAILING: {h.name} monitor",
@@ -123,6 +126,7 @@ def run(notifier: Notifier, test_alert: bool = False) -> int:
                                    open_body(h, page, fresh, markers), False))
                 new["open_matches"] = matches
             new["widget_markers"] = ex.widget_markers
+            plog(f"checked {page.id}: ok")
             summary.append(f"{page.id}: ok, {len(relevant)} relevant sentences"
                            + (", CHANGED" if new.get("last_changed") == t else ""))
 

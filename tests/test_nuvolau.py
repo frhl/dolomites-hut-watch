@@ -26,8 +26,9 @@ class Recorder:
     def issue_exists(self, title):
         return False
 
-    def ntfy(self, title, message, priority=4, click=None, phone=None, tags=None):
+    def ntfy(self, title, message, priority=4, click=None, phone=None, tags=None, **kw):
         self.pushes.append((title, priority, click, message))
+        self.delays = getattr(self, "delays", []) + [kw.get("delay")]
         return True
 
     def telegram(self, text):
@@ -154,7 +155,9 @@ class Runner(unittest.TestCase):
         r = self.step()[1]
         self.assertEqual(self.titles(r).count(nuvolau.OPENING_TITLE), 3)
         self.assertTrue(all(p[1] == 5 for p in r.pushes if p[0] == nuvolau.OPENING_TITLE))
-        self.assertEqual(self.sleeps, [60, 60])
+        opening_delays = [d for p, d in zip(r.pushes, r.delays) if p[0] == nuvolau.OPENING_TITLE]
+        self.assertEqual(opening_delays, [None, "60s", "120s"])  # ntfy-scheduled, no sleeping
+        self.assertEqual(self.sleeps, [])
         self.assertEqual(self.titles(self.step()[1]).count(nuvolau.OPENING_TITLE), 0)  # once only
 
     def test_beds_realert_and_gone(self):
@@ -244,9 +247,11 @@ class Dense(unittest.TestCase):
         self.now = nuvolau.DENSE_START + dt.timedelta(hours=10)
         self.forms = []          # sequence of form states returned by successive probes
         self.calls = 0
-        engine = types.SimpleNamespace(_params=lambda hut: {}, fetch_form=self.fake_form)
+        engine = types.SimpleNamespace(_params=lambda hut: {}, fetch_form=self.fake_form,
+                                       booking_open=lambda hut, fetch: (True, "form live"))
         for p in [
             mock.patch.object(nuvolau, "OPENING_FILE", Path(tmp.name) / "nuvolau_opening.json"),
+            mock.patch.object(nuvolau, "DENSE_FILE", Path(tmp.name) / "nuvolau_dense.json"),
             mock.patch.object(nuvolau, "_engine", lambda: engine),
             mock.patch.object(nuvolau, "sleep", self.fake_sleep),
             mock.patch.object(nuvolau, "monotonic", lambda: self.clock),
@@ -271,11 +276,12 @@ class Dense(unittest.TestCase):
         self.assertEqual(nuvolau.dense(Recorder(), rows=[]), 0)
         self.assertEqual(self.calls, 0)
 
-    def test_probes_every_minute_until_open_then_fires_once(self):
-        self.forms = [False, http.FetchError("HTTP 503"), False, True]
+    def test_probes_every_minute_fires_once_and_keeps_probing(self):
+        self.forms = [False, http.FetchError("HTTP 503"), False, True] + [True] * 200
         r = Recorder()
         nuvolau.dense(r, rows=[])
-        self.assertEqual(self.calls, 4)
+        # Same number of probes as a block without an opening: the job looks the same.
+        self.assertEqual(self.calls, int(nuvolau.DENSE_BLOCK.total_seconds() // nuvolau.DENSE_INTERVAL_S))
         self.assertEqual([p[0] for p in r.pushes], [nuvolau.OPENING_TITLE] * 3)
         self.assertIn(nuvolau.OPENING_ISSUE, r.issues)
         # Lock written: a later job (or the 5-min tick) does not fire again.

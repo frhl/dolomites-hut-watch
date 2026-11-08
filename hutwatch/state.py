@@ -1,4 +1,5 @@
-"""JSON state files committed back to the repo by the workflows."""
+"""JSON state files. They hold results and page text, so they live in the PRIVATE repo
+frhl/dolomites-hut-watch-state, checked out at ./private (never in the public repo)."""
 
 from __future__ import annotations
 
@@ -10,7 +11,8 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
 # HUTWATCH_STATE_DIR lets the Mac launchd job keep its own state outside the repo.
-STATE_DIR = Path(os.environ["HUTWATCH_STATE_DIR"]) if os.environ.get("HUTWATCH_STATE_DIR") else ROOT / "state"
+STATE_DIR = (Path(os.environ["HUTWATCH_STATE_DIR"]) if os.environ.get("HUTWATCH_STATE_DIR")
+             else ROOT / "private" / "state")
 ROME = ZoneInfo("Europe/Rome")
 
 

@@ -19,10 +19,14 @@ fi
 echo "$now" > "$STATE/last_run"
 echo "=== $(date -u +%FT%TZ)"
 
-# Pick up tracker/code updates, but only if the clone has no local edits.
-if [ -z "$(git -C "$REPO" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
-  git -C "$REPO" pull -q --ff-only 2>&1 || echo "warn: git pull failed; using the local copy"
-fi
+# Pick up code (public repo) and tracker (private state repo, ./private) updates, but only
+# if a clone has no local edits.
+for d in "$REPO" "$REPO/private"; do
+  [ -d "$d/.git" ] || continue
+  if [ -z "$(git -C "$d" status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+    git -C "$d" pull -q --ff-only 2>&1 || echo "warn: git pull failed in $d; using the local copy"
+  fi
+done
 
 NTFY_TOPIC="$(cat "$CONF/ntfy_topic" 2>/dev/null || true)"
 if [ -z "$NTFY_TOPIC" ]; then
@@ -30,6 +34,7 @@ if [ -z "$NTFY_TOPIC" ]; then
   exit 1
 fi
 export NTFY_TOPIC HUTWATCH_STATE_DIR="$STATE" HUTWATCH_ISSUES=off
+export HUTWATCH_TRACKER="$REPO/private/AV1-booking-tracker.xlsx"
 DRY=()
 [ -n "${HUTWATCH_DRY_RUN:-}" ] && DRY=(--dry-run)
 cd "$REPO" && exec "$PY" -m hutwatch fast ${DRY[@]+"${DRY[@]}"} --only fanes lavarella pederue fodara_vedla

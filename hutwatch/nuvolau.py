@@ -20,10 +20,11 @@ from .beds_config import GUESTS, BedHut, BedNight
 from .engines.base import Hut
 from .extract import extract
 from .notify import Notifier
-from .redact import log
+from .redact import log, plog, reason
 
 STATE_FILE = state.STATE_DIR / "nuvolau.json"
 OPENING_FILE = state.STATE_DIR / "nuvolau_opening.json"
+DENSE_FILE = state.STATE_DIR / "nuvolau_dense.json"   # written every dense run (uniform commits)
 FAIL_THRESHOLD = 3
 OPENING_TITLE = "NUVOLAU 2027 BOOKING IS OPEN"
 OPENING_REPEATS = 3
@@ -114,6 +115,7 @@ def check_announcements(st: dict, notifier: Notifier, summary: list[str]) -> Non
         except Exception as e:  # noqa: BLE001
             _fail(rec, e, "announcement watch", url, notifier)
             summary.append(f"announce {url}: ERROR {e}")
+            plog(f"checked Nuvolau page {url}: FAIL ({reason(e)})")
             continue
         _ok(rec, "announcement watch", notifier)
 
@@ -146,6 +148,7 @@ def check_announcements(st: dict, notifier: Notifier, summary: list[str]) -> Non
                            f"**Page:** {url}\n\n```diff\n{detect.diff(rec.get('sentences', []), relevant)}\n```")
         rec["hash"], rec["sentences"] = h, relevant
         summary.append(f"announce {url}: ok, {len(matches)} announcement sentence(s)")
+        plog(f"checked Nuvolau page {url}: ok")
 
 
 OPENING_ISSUE = "OPENING: Nuvolau 2027 booking is open"
@@ -166,14 +169,15 @@ def already_alerted(notifier: Notifier) -> str | None:
 
 
 def fire_opening(notifier: Notifier, detail: str, by: str) -> bool:
-    """OPENING alert: urgent push x3, 1 min apart, + Telegram + issue. True if delivered."""
+    """OPENING alert: urgent push x3, 1 min apart, + Telegram + issue. True if delivered.
+    The repeats use ntfy's scheduled delivery, so the job doesn't run longer (a public run
+    taking 2 extra minutes would itself give the opening away)."""
     pushed = 0
     for i in range(OPENING_REPEATS):
-        if i:
-            sleep(OPENING_GAP_S)
         pushed += notifier.ntfy(OPENING_TITLE, f"{detail}. Book now: {HUT.booking_url}"
                                 + (f" | Phone {HUT.phone}" if HUT.phone else ""),
-                                priority=5, click=HUT.booking_url, phone=HUT.phone, tags=["rotating_light"])
+                                priority=5, click=HUT.booking_url, phone=HUT.phone, tags=["rotating_light"],
+                                delay=f"{i * OPENING_GAP_S}s" if i else None)
     notifier.telegram(f"{OPENING_TITLE}\n{HUT.booking_url}")
     recorded = _issue(notifier, OPENING_ISSUE,
                       f"The 2027 booking calendar is live: {detail}\n\n**Book:** {HUT.booking_url}\n\n"
@@ -187,20 +191,23 @@ def fire_opening(notifier: Notifier, detail: str, by: str) -> bool:
 
 
 def check_opening(st: dict, notifier: Notifier, summary: list[str], fetch=None) -> bool:
+    """Always probes (also after the alert), so requests, timing and logs look the same
+    before and after opening day."""
     rec = st.setdefault("opening", {})
     done = already_alerted(notifier)
-    if done:
-        summary.append(f"opening: {done}")
-        return True
     try:
         is_open, detail = _engine().booking_open(HUT, fetch or http.request)
     except Exception as e:  # noqa: BLE001
         _fail(rec, e, "opening check", HUT.booking_url, notifier)
         summary.append(f"opening: ERROR {e}")
-        return False
+        plog(f"checked Nuvolau booking form: FAIL ({reason(e)})")
+        return bool(done)
     _ok(rec, "opening check", notifier)
+    plog("checked Nuvolau booking form: ok")
     rec["last_detail"] = detail[:300]
-    summary.append(f"opening: {'OPEN' if is_open else 'not open'} ({detail})")
+    summary.append(f"opening: {'OPEN' if is_open else 'not open'} ({detail})" + (f"; {done}" if done else ""))
+    if done:
+        return True
     if not is_open:
         if "imminent" in detail and not rec.get("imminent_alerted"):
             notifier.ntfy("NUVOLAU: opening looks imminent", detail[:300], priority=4,
@@ -225,45 +232,42 @@ monotonic = time.monotonic  # patched in tests
 
 
 def dense(notifier: Notifier, minutes: float | None = None, rows=...) -> int:
-    """Probe the booking form every DENSE_INTERVAL_S until it goes live, the block ends, or
-    the window ends. `minutes` (manual test runs) ignores the window and limits the loop."""
+    """Probe the booking form every DENSE_INTERVAL_S until the block or window ends.
+    Keeps probing after an alert (never re-alerting) so the job looks the same either way.
+    `minutes` (manual test runs) ignores the window and limits the loop."""
     now = state.now()
     if minutes is None and not (DENSE_START <= now < DENSE_END):
-        log(f"{now} outside dense window {DENSE_START} - {DENSE_END}: nothing to do")
+        plog("checked Nuvolau booking form: not in the dense window, nothing to do")
         return 0
     if rows is ...:
         rows = tracker.load_or_warn()
     active, notes = beds.active_nights(NIGHTS, rows, state.today_rome())
     if not active:
-        log("; ".join(notes) + " - no Nuvolau night left")
+        plog("checked Nuvolau booking form: no Nuvolau night left, nothing to do")
         return 0
     span = dt.timedelta(minutes=minutes) if minutes is not None else min(DENSE_BLOCK, DENSE_END - now)
     deadline = monotonic() + span.total_seconds()
     p = _engine()._params(HUT)
     probes = fails = 0
     while True:
-        done = already_alerted(notifier)
-        if done:
-            log(f"dense: {done}; stopping")
-            return 0
         probes += 1
         try:
             form = _engine().fetch_form(http.request, p)
-            fails = 0
         except Exception as e:  # noqa: BLE001 - the 5/15-min ticks own the FAILING alert
             fails += 1
-            log(f"dense probe {probes}: ERROR {e} ({fails} in a row)")
+            log(f"dense probe {probes}: ERROR {e}")
         else:
-            if form.enabled:
+            if form.enabled and not already_alerted(notifier):
                 fire_opening(notifier, "booking form is live (dense probe)", by="dense")
                 log(f"dense probe {probes}: OPEN, alert sent")
-                return 0
-            if probes == 1 or probes % 30 == 0:
-                log(f"dense probe {probes}: still disabled ({form.message!r})")
+            elif probes == 1 or probes % 30 == 0:
+                log(f"dense probe {probes}: {'live' if form.enabled else 'still disabled'}")
         if monotonic() + DENSE_INTERVAL_S >= deadline:
-            log(f"dense: block finished after {probes} probes")
-            return 0
+            break
         sleep(DENSE_INTERVAL_S)
+    plog(f"checked Nuvolau booking form {probes} times: {probes - fails} ok, {fails} failed")
+    state.save(DENSE_FILE, {"last_run": state.iso(state.now()), "probes": probes, "failed": fails})
+    return 0
 
 
 def run(notifier: Notifier, rows=...) -> bool:
@@ -274,12 +278,12 @@ def run(notifier: Notifier, rows=...) -> bool:
     active, summary = beds.active_nights(NIGHTS, rows, today)
     if not active:
         beds.write_summary("Nuvolau", summary + ["Nuvolau: no active night, nothing checked"])
+        plog("checked Nuvolau: no Nuvolau night left, nothing to do")
         return False
     st = state.load(STATE_FILE)
     fetch = _memo_fetch()
-    opened = check_opening(st, notifier, summary, fetch)
-    if not opened:
-        check_announcements(st, notifier, summary)  # moot once the calendar is live
+    check_opening(st, notifier, summary, fetch)
+    check_announcements(st, notifier, summary)  # always, so runs look the same after opening
     table = list(beds.TABLE_HEAD)
     entries = st.setdefault("entries", {})
     now = state.now()
@@ -292,6 +296,7 @@ def run(notifier: Notifier, rows=...) -> bool:
     for k in list(entries):
         if k not in live:
             entries.pop(k)
+    st["last_run"] = state.iso(now)
     state.save(STATE_FILE, st)
     beds.write_summary("Nuvolau", summary + [""] + table)
     return True

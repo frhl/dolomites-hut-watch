@@ -11,7 +11,7 @@ import os
 import sys
 
 from . import http
-from .redact import ScrubList, scrub
+from .redact import ScrubList, log, scrub
 
 GITHUB_API = "https://api.github.com"
 
@@ -32,7 +32,7 @@ class Notifier:
         # that wants alerts on ntfy only) logs them instead. ntfy/Telegram still send.
         self.issues_on = bool(self.token and self.repo) and os.environ.get("HUTWATCH_ISSUES", "on") != "off"
         if not dry_run and not self.issues_on:
-            print("NOTE: GitHub issues disabled; issue alerts are only logged", file=sys.stderr)
+            log("NOTE: GitHub issues disabled; issue alerts are only logged", file=sys.stderr)
 
     # ---------------- GitHub issues ----------------
     def _gh(self, method: str, path: str, body=None, params=None):
@@ -77,7 +77,7 @@ class Notifier:
             return None
         if not self.issues_on:
             # Logs of a public repo are public: record that an alert happened, not its content.
-            print(f"[issue alert not posted: issues off] {title}")
+            log(f"[issue alert not posted: issues off] {title}")  # silent in public mode
             return None
         idx = self._issue_index()
         if title in idx:
@@ -109,10 +109,10 @@ class Notifier:
     # ---------------- ntfy.sh ----------------
     def ntfy(self, title: str, message: str, *, priority: int = 4, click: str | None = None,
              phone: str | None = None, tags: list[str] | None = None,
-             extra_actions: list[dict] | None = None) -> bool:
+             extra_actions: list[dict] | None = None, delay: str | None = None) -> bool:
         """Send one push. Returns True if ntfy accepted it (or dry run)."""
         if not self.ntfy_topic:
-            print("WARNING: NTFY_TOPIC not set; skipping push", file=sys.stderr)
+            log("WARNING: NTFY_TOPIC not set; skipping push", file=sys.stderr)
             return False
         actions = []
         if click:
@@ -125,6 +125,8 @@ class Notifier:
                    "priority": priority, "tags": tags or []}
         if click:
             payload["click"] = click
+        if delay:  # ntfy scheduled delivery, e.g. "1m": repeats without making the job run longer
+            payload["delay"] = delay
         if actions:
             payload["actions"] = actions
         if self.dry_run:

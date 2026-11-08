@@ -19,7 +19,7 @@ from . import http, state, tracker
 from .beds_config import GUESTS, NIGHTS, BedHut, BedNight
 from .engines.base import CheckResult, Hut, Status
 from .notify import Notifier
-from .redact import log, scrub
+from .redact import log, plog, public, reason, scrub
 
 STATE_FILE = state.STATE_DIR / "beds.json"
 FAIL_THRESHOLD = 3
@@ -53,6 +53,7 @@ def active_nights(nights: list[BedNight], rows, today) -> tuple[list[BedNight], 
 
 
 def tracker_health(st: dict, rows, notifier: Notifier, summary: list[str]) -> None:
+    plog("checked tracker: " + ("ok" if rows is not None else "FAIL (unreadable)"))
     if rows is None:
         summary.append("WARNING: tracker unreadable, Booked statuses ignored")
         if not st.get("tracker_alerted"):
@@ -77,8 +78,21 @@ def hut_phone(rows, night: dt.date, bh: BedHut) -> str | None:
 def process_hut(entries: dict, hut: Hut, night: dt.date, phone: str | None,
                 check: Callable[[], CheckResult], notifier: Notifier, now: dt.datetime,
                 table: list[str]) -> None:
-    """Run one availability check and emit BEDS / GONE / FAILING events for it."""
+    """Run one availability check, emit its events, and print one public health line
+    ("checked <hut> <night>: ok | FAIL (<reason>)") that never depends on availability."""
+    try:
+        ok, why = _process_hut(entries, hut, night, phone, check, notifier, now, table)
+    except Exception as e:  # noqa: BLE001 - a bug must not stop the other huts
+        ok, why = False, "internal error"
+        notifier.errors.append(f"{hut.name} {night}: internal error {type(e).__name__}: {e}")
+    plog(f"checked {hut.name} {night_label(night)}: " + ("ok" if ok else f"FAIL ({why})"))
+
+
+def _process_hut(entries: dict, hut: Hut, night: dt.date, phone: str | None,
+                 check: Callable[[], CheckResult], notifier: Notifier, now: dt.datetime,
+                 table: list[str]) -> tuple[bool, str]:
     key = f"{night}/{hut.id}"
+    check_ok, why = True, ""
     old = entries.get(key, {})
     new = dict(old)
     events = []  # (kind, title, body, push_priority or None)
@@ -91,6 +105,7 @@ def process_hut(entries: dict, hut: Hut, night: dt.date, phone: str | None,
             raise http.FetchError(f"unclassifiable response: {res.detail}")
     except Exception as e:  # noqa: BLE001 - any failure counts
         res = None
+        check_ok, why = False, reason(e)
         cnt = old.get("consecutive_failures", 0) + 1
         new.update(consecutive_failures=cnt, last_error=str(e)[:500])
         if cnt >= FAIL_THRESHOLD and not old.get("failure_alerted"):
@@ -141,9 +156,11 @@ def process_hut(entries: dict, hut: Hut, night: dt.date, phone: str | None,
                        + (f" | Phone {phone}" if phone else ""))
             else:
                 msg = body.split("\n\n")[0].replace("**", "")
-            notifier.ntfy(push_title, msg, priority=prio, click=hut.booking_url,
-                          phone=phone if kind == "beds" else None,
-                          tags=["bed"] if kind == "beds" else ["warning"])
+            pushed = notifier.ntfy(push_title, msg, priority=prio, click=hut.booking_url,
+                                   phone=phone if kind == "beds" else None,
+                                   tags=["bed"] if kind == "beds" else ["warning"])
+            if notifier.ntfy_topic and not pushed:
+                delivered = False  # ntfy down: keep old state, the event fires again next run
             notifier.telegram(f"{push_title}\n{hut.booking_url}" + (f"\nPhone: {phone}" if phone else ""))
         try:
             notifier.issue(title, body, comment_only=(kind == "recovered"))
@@ -152,11 +169,14 @@ def process_hut(entries: dict, hut: Hut, night: dt.date, phone: str | None,
             notifier.errors.append(f"issue '{title}' failed: {e}")
         if kind == "beds":
             new["last_alert"] = state.iso(now)
-    # Undelivered issue -> keep old state so the event fires again next run.
+    # Undelivered push/issue -> keep old state so the event fires again next run.
     entries[key] = new if delivered else old
+    return check_ok, why
 
 
 def write_summary(title: str, lines: list[str]) -> None:
+    if public():
+        return  # results stay private; plog() already wrote the health lines
     report = scrub("\n".join(lines))
     log(report)
     if os.environ.get("GITHUB_STEP_SUMMARY"):
@@ -184,6 +204,7 @@ def run(notifier: Notifier, only: set[str] | None = None, rows=..., ) -> bool:
             if only and bh.hut.id not in only:
                 continue
             if on_ci and bh.hut.params.get("blocked_on_ci"):
+                plog(f"checked {bh.hut.name} {night_label(n.night)}: skipped on GitHub (checked from the Mac)")
                 table.append(f"| {n.night} | {bh.hut.name} | SKIPPED | engine blocks GitHub runners (HTTP 403); "
                              "run locally, see STATUS.md |")
                 entries.pop(f"{n.night}/{bh.hut.id}", None)
@@ -196,6 +217,7 @@ def run(notifier: Notifier, only: set[str] | None = None, rows=..., ) -> bool:
     for k in list(entries):
         if k not in live:
             entries.pop(k)  # nights no longer watched
+    st["last_run"] = state.iso(now)
     state.save(STATE_FILE, st)
     write_summary("Cancellation watch", summary + ([""] + table if len(table) > 2 else []))
     return bool(active)

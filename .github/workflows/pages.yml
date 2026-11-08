@@ -11,8 +11,11 @@ on:
         type: boolean
         default: false
 
+# Logs of this public repo are public: only "checked <x>: ok|FAIL" lines are printed.
+# Results and page text go to the private state repo; the only public commit is the
+# generated STATUS.md (run times + OK/FAILING), which also keeps the schedules alive.
 permissions:
-  contents: write   # commit state/pages.json
+  contents: write   # public STATUS.md keep-alive commit
   issues: write     # alerts
   actions: write    # self-disable after 2027-06-28
 
@@ -44,6 +47,12 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - name: Check out private state repo
+        uses: actions/checkout@v4
+        with:
+          repository: frhl/dolomites-hut-watch-state
+          ssh-key: ${{ secrets.STATE_DEPLOY_KEY }}
+          path: private
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -56,8 +65,14 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TEST_ALERT: ${{ inputs.test_alert }}
+          HUTWATCH_PUBLIC_LOG: "1"
           HUTWATCH_ISSUES: ${{ vars.HUTWATCH_ISSUES }}
         run: python -m hutwatch pages
-      - name: Commit state
+      - name: Commit private state
         if: always()
-        run: scripts/commit_state.sh "page-watch state $(date -u +%FT%TZ)" state/pages.json
+        run: scripts/commit_state.sh private "page-watch $(date -u +%FT%TZ)" state
+      - name: Public status (keep-alive)
+        if: always()
+        run: |
+          python -m hutwatch status
+          scripts/commit_state.sh . "status $(date -u +%FT%TZ)" STATUS.md

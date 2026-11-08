@@ -50,6 +50,10 @@ PL
 
 if [ "${1:-}" = "--print-plist" ]; then plist; exit 0; fi
 
+if [ ! -d "$REPO/private/.git" ]; then  # tracker lives in the private state repo
+  git clone -q https://github.com/frhl/dolomites-hut-watch-state.git "$REPO/private" \
+    || echo "warn: could not clone the private state repo; the tracker will be missing"
+fi
 mkdir -p "$CONF" "$HOME/Library/LaunchAgents" "$(dirname "$LOG")"
 chmod 700 "$CONF"
 if [ ! -s "$CONF/ntfy_topic" ]; then
