@@ -73,6 +73,8 @@ jobs:
         run: scripts/commit_state.sh private "page-watch $(date -u +%FT%TZ)" state
       - name: Public status (keep-alive)
         if: always()
+        env:
+          HUTWATCH_PUBLIC_LOG: "1"
         run: |
           python -m hutwatch status
           scripts/commit_state.sh . "status $(date -u +%FT%TZ)" STATUS.md

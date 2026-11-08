@@ -15,8 +15,9 @@ if git diff --cached --quiet; then
 fi
 git commit -q -m "$msg"
 for i in 1 2 3; do
-  if git push -q; then exit 0; fi
-  git pull -q --rebase
+  # stderr silenced: concurrent jobs make the first push bounce, and the hint text is noise
+  if git push -q 2>/dev/null; then exit 0; fi
+  git pull -q --rebase 2>/dev/null
 done
 echo "Could not push after 3 attempts." >&2
 exit 1
