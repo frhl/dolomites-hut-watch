@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       test_alert:
-        description: "Send a test alert (GitHub issue + Telegram if configured)"
+        description: "Send a test alert (ntfy + GitHub issue/Telegram if configured)"
         type: boolean
         default: false
 
@@ -52,6 +52,7 @@ jobs:
       - name: Check pages
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           TEST_ALERT: ${{ inputs.test_alert }}

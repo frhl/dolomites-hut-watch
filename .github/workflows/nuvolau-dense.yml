@@ -12,8 +12,8 @@ on:
   workflow_dispatch:
     inputs:
       minutes:
-        description: "Test run: probe for this many minutes (ignores the date window)"
-        default: "3"
+        description: "Test only: probe for N minutes ignoring the date window (empty = normal run)"
+        default: ""
 
 permissions:
   contents: write   # commit state/nuvolau_opening.json

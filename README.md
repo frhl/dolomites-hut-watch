@@ -27,13 +27,13 @@ lets you be online at that moment instead of relying on the OPENING alert arrivi
 | `BEDS: <hut> <night>` | Beds for 2 available, any room type. If they are only in different rooms, the push starts `SPLIT across rooms:` and the issue says so. | ntfy p4 (tap opens booking page, call button), Telegram, issue. Re-alert every 2 h while available; one `GONE:` push when they go. |
 | `ANNOUNCEMENT: Nuvolau 2027 booking` | Nuvolau pages announce the opening date/time | ntfy p5 if a date/time is in the text (else p4), issue with the matched text |
 | `NUVOLAU 2027 BOOKING IS OPEN` | Nuvolau's booking calendar goes live for any date | ntfy p5 (urgent) x3, 1 min apart, tap opens the booking form; issue |
-| `OPEN: <hut> 2027 bookings` | 28 Jun huts: page mentions 2027 with booking language (negatives like "non ancora" ignored) or the CAI booking calendar appears | Issue with the ready-to-send booking email (add your name) |
-| `CHANGE: <hut> page` | Booking-relevant text changed | Issue with before/after diff (Nuvolau: also a low-priority push) |
-| `FAILING: ...` | 3 consecutive failures of any check | Issue and/or ntfy; "Recovered" note later |
+| `OPEN: <hut> 2027 bookings` | 28 Jun huts: page mentions 2027 with booking language (negatives like "non ancora" ignored) or the CAI booking calendar appears | ntfy p4 with an **Email hut** button (pre-filled booking email; add your name), issue if on |
+| `CHANGE: <hut> page` | Booking-relevant text changed | ntfy p3 (Nuvolau p2), issue with before/after diff if on |
+| `FAILING: ...` | 3 consecutive failures of any check | ntfy p3, issue if on; "Recovered" note later (issue only) |
 
-One open issue per hut and event type; later events comment on it. Set the repository
-variable `HUTWATCH_ISSUES=off` to send ntfy/Telegram only (useful if the repo is public:
-issues are then public too).
+Every alert goes to ntfy. GitHub issues are **off** (repository variable `HUTWATCH_ISSUES=off`,
+because the repo is public); with it unset, each alert also opens or comments on one issue per
+hut and event type. With issues off, run logs record only an alert's title, never its body.
 
 ## Setup
 

@@ -56,6 +56,8 @@ def tracker_health(st: dict, rows, notifier: Notifier, summary: list[str]) -> No
     if rows is None:
         summary.append("WARNING: tracker unreadable, Booked statuses ignored")
         if not st.get("tracker_alerted"):
+            notifier.ntfy("FAILING: tracker unreadable", "Booked statuses are ignored until it is fixed.",
+                          priority=3, tags=["warning"])
             try:
                 notifier.issue("FAILING: tracker unreadable",
                                f"Could not read `{tracker.DEFAULT_PATH.name}` (sheet `{tracker.SHEET}`). "

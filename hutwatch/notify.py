@@ -108,7 +108,8 @@ class Notifier:
 
     # ---------------- ntfy.sh ----------------
     def ntfy(self, title: str, message: str, *, priority: int = 4, click: str | None = None,
-             phone: str | None = None, tags: list[str] | None = None) -> bool:
+             phone: str | None = None, tags: list[str] | None = None,
+             extra_actions: list[dict] | None = None) -> bool:
         """Send one push. Returns True if ntfy accepted it (or dry run)."""
         if not self.ntfy_topic:
             print("WARNING: NTFY_TOPIC not set; skipping push", file=sys.stderr)
@@ -119,6 +120,7 @@ class Notifier:
         if phone:
             actions.append({"action": "view", "label": f"Call {phone}", "url": "tel:" + "".join(
                 ch for ch in phone if ch.isdigit() or ch == "+")})
+        actions += extra_actions or []
         payload = {"topic": self.ntfy_topic, "title": title, "message": message[:3500],
                    "priority": priority, "tags": tags or []}
         if click:

@@ -124,6 +124,39 @@ class RunLoop(unittest.TestCase):
         self.assertIn("Prenotazione per il 28 giugno 2027", body)
         self.assertEqual(self.run_once()[1], [])                 # same text: no repeat alert
 
+    def test_open_alert_is_pushed_with_email_button(self):
+        self.run_once()
+        url = "http://www.piandefontana.it/"
+        self.pages[url] = "<p>Prenotazioni aperte per la stagione 2027!</p><p>Contatti</p>" + "x" * 60
+        n = FakeNotifier()
+        n.ntfy_topic = "t"
+        pushes = []
+        n.ntfy = lambda title, msg, **k: pushes.append((title, msg, k)) or True
+        pagewatch.run(n)
+        open_push = [p for p in pushes if p[0] == "OPEN: Pian de Fontana 2027 bookings"]
+        self.assertEqual(len(open_push), 1)
+        title, msg, k = open_push[0]
+        self.assertEqual(k["priority"], 4)
+        self.assertIn("Prenotazioni aperte per la stagione 2027", msg)
+        email = k["extra_actions"][0]["url"]
+        self.assertTrue(email.startswith("mailto:piandefontana@livecom.it?"))
+        self.assertIn("28%20giugno%202027", email)
+
+    def test_failed_push_refires_next_run(self):
+        self.run_once()
+        url = "http://www.piandefontana.it/"
+        self.pages[url] = "<p>Prenotazioni aperte per la stagione 2027!</p><p>Contatti</p>" + "x" * 60
+        n = FakeNotifier()
+        n.ntfy_topic = "t"
+        n.ntfy = lambda *a, **k: False  # ntfy down
+        pagewatch.run(n)
+        n2 = FakeNotifier()
+        n2.ntfy_topic = "t"
+        got = []
+        n2.ntfy = lambda title, *a, **k: got.append(title) or True
+        pagewatch.run(n2)
+        self.assertIn("OPEN: Pian de Fontana 2027 bookings", got)
+
     def test_three_failures_alert_once_then_recover(self):
         self.run_once()
         url = "https://www.rifugiosommarivaalpramperet.it/"

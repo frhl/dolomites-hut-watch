@@ -15,9 +15,13 @@ STATE_FILE = state.STATE_DIR / "pages.json"
 FAIL_THRESHOLD = 3
 
 
-def booking_email(to: str) -> str:
-    mailto = f"mailto:{to}?" + urllib.parse.urlencode(
+def mailto_link(to: str) -> str:
+    return f"mailto:{to}?" + urllib.parse.urlencode(
         {"subject": EMAIL_SUBJECT, "body": EMAIL_BODY}, quote_via=urllib.parse.quote)
+
+
+def booking_email(to: str) -> str:
+    mailto = mailto_link(to)
     return (
         "### Booking email (send it yourself)\n\n"
         f"**To:** {to}  \n**Subject:** {EMAIL_SUBJECT}\n\n"
@@ -49,6 +53,9 @@ def run(notifier: Notifier, test_alert: bool = False) -> int:
 
     if test_alert:
         h = HUTS[0]
+        notifier.ntfy("TEST: page watch alert", "Test push from the page watch (OPEN alerts look like this).",
+                      priority=4, click=PAGES[0].url, tags=["tada", "test_tube"],
+                      extra_actions=[{"action": "view", "label": "Email hut", "url": mailto_link(h.email_to)}])
         notifier.issue("TEST: page watch alert",
                        "Test alert from the page watch (manual run). If you got this, issue "
                        "alerts work.\n\n" + booking_email(h.email_to))
@@ -121,10 +128,22 @@ def run(notifier: Notifier, test_alert: bool = False) -> int:
 
         delivered = True
         for title, body, comment_only in events:
+            if not comment_only:
+                # Push (the only channel when issues are off): short text + tap to the page;
+                # OPEN alerts get an "Email hut" button pre-filled with the booking email.
+                kind = title.split(":", 1)[0]
+                first = next((ln[2:] for ln in body.splitlines() if ln.startswith("> ")), "")
+                msg = (first or body.split("\n\n")[0]).replace("**", "")[:300]
+                extra = ([{"action": "view", "label": "Email hut", "url": mailto_link(h.email_to)}]
+                         if kind == "OPEN" and h.email_to else None)
+                pushed = notifier.ntfy(title, msg, priority={"OPEN": 4}.get(kind, 3), click=page.url,
+                                       tags={"OPEN": ["tada"], "CHANGE": ["pencil"]}.get(kind, ["warning"]),
+                                       extra_actions=extra)
+                if notifier.ntfy_topic and not pushed:
+                    delivered = False
+                notifier.telegram(f"{title}\n{page.url}")
             try:
                 notifier.issue(title, body, comment_only=comment_only)
-                if not comment_only:
-                    notifier.telegram(f"{title}\n{page.url}")
             except Exception as e:  # noqa: BLE001
                 delivered = False
                 notifier.errors.append(f"issue '{title}' failed: {e}")
