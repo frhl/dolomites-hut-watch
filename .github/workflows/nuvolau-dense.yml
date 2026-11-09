@@ -1,10 +1,12 @@
 name: nuvolau-dense
 
 # Rifugio Nuvolau: 1-minute probe of the booking form around 1 Feb 2027 (last year the
-# June stage opened on 1 Feb). Each job loops ~3 h; the cron starts one every 3 h inside
-# the window (31 Jan 21:00 UTC - 3 Feb 00:00 UTC), and the script exits outside it.
+# June stage opened on 1 Feb). Each job loops ~3 h; cron-job.org starts one every 3 h
+# inside the window (31 Jan 21:00 UTC - 3 Feb 00:00 UTC) via workflow_dispatch
+# (scripts/setup_triggers.py); GitHub's own cron below is a backup (it drops most runs).
+# Extra starts just queue behind the running job; the script exits outside the window.
 # 1 request per minute. Shares the OPENING lock with cancellation-watch, so only one
-# OPENING alert is ever sent. GitHub may start a job 10-30 min late.
+# OPENING alert is ever sent.
 on:
   schedule:
     - cron: "0 21 31 1 *"

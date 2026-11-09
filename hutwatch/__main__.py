@@ -3,8 +3,9 @@
        python -m hutwatch dense  [--dry-run] [--minutes N]   (Nuvolau 1-min probe, ~1 Feb)
        python -m hutwatch status                              (write the public STATUS.md)
 
-`fast` = cancellation watch + Nuvolau watch (reads $SCHEDULE to tell 15-min ticks
-from the extra 5-min Nuvolau ticks; empty = manual run = everything).
+`fast` = cancellation watch + Nuvolau watch. $SCOPE=nuvolau runs only the Nuvolau checks
+(the extra 5-min ticks); $SCHEDULE is set when GitHub's own cron started the run, which is
+only a backup for the external trigger (see fast.py and pagewatch.run).
 
 With HUTWATCH_PUBLIC_LOG=1 (the workflows: logs of a public repo are public) only
 health lines are printed; alert-delivery errors and crashes are written to

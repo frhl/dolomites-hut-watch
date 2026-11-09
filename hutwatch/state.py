@@ -32,6 +32,11 @@ def parse(s: str | None) -> dt.datetime | None:
     return dt.datetime.fromisoformat(s) if s else None
 
 
+def minutes_since(s: str | None) -> float | None:
+    t = parse(s)
+    return None if t is None else (now() - t).total_seconds() / 60
+
+
 def load(path: Path) -> dict:
     if path.exists():
         return json.loads(path.read_text())

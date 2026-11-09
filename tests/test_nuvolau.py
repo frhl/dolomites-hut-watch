@@ -201,18 +201,14 @@ class Runner(unittest.TestCase):
 
 
 class FastTicks(unittest.TestCase):
-    def test_five_minute_tick_skips_other_huts(self):
+    def test_nuvolau_scope_skips_other_huts(self):
         with mock.patch.object(fast.beds, "run") as b, mock.patch.object(fast.nuvolau, "run") as n, \
                 mock.patch.object(fast.tracker, "load_or_warn", lambda: []):
-            fast.run(Recorder(), schedule="5,10,20,25,35,40,50,55 * * 1 *")
+            fast.run(Recorder(), schedule="", scope="nuvolau")
             b.assert_not_called()
             n.assert_called_once()
-            fast.run(Recorder(), schedule=fast.FULL_TICK)
+            fast.run(Recorder(), schedule="", scope="all")
             b.assert_called_once()
-
-    def test_full_tick_matches_workflow(self):
-        wf = (Path(__file__).resolve().parent.parent / ".github/workflows/beds.yml").read_text()
-        self.assertIn(f'- cron: "{fast.FULL_TICK}"', wf)
 
     def test_test_alert_sends_one_push_per_type(self):
         r = Recorder()

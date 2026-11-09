@@ -31,7 +31,8 @@ EVENT_PAGE = ("<p>Apertura/Open : Sabato 5 giugno 2027</p><p>Prenotazioni 2027: 
 ALLOWED = re.compile(
     r"^(checked .+: (ok|FAIL \([^)]*\)|skipped on GitHub \(checked from the Mac\)|"
     r"not checked \(night no longer watched\)|not in the dense window, nothing to do)"
-    r"|checked Nuvolau booking form \d+ times: \d+ ok, \d+ failed)$")
+    r"|checked Nuvolau booking form \d+ times: \d+ ok, \d+ failed"
+    r"|skipped (hut|Nuvolau|page) checks: backup schedule, last run under \d+ min ago)$")
 
 
 class World:

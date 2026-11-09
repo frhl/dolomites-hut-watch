@@ -30,14 +30,36 @@ availability:
 | Runner | Schedule | Watches |
 |---|---|---|
 | `page-watch` (`pages.yml`) | every 4 h | 28 Jun: Pian de Fontana (preferred) + Pramperet (fallback), bookings opening. Change-watch for huts with no queryable engine (Sennes, Muntagnoles, Cinque Torri, Capanna Alpina). |
-| `cancellation-watch` (`beds.yml`) | every 15 min; Nuvolau also every 5 min from 15 Dec to 15 Feb | Beds for 2 on 22 Jun (Biella) and 23 Jun (Lagazuoi, Scotoni, Col Gallina, Averau, Scoiattoli); Rifugio Nuvolau opening watch + beds on 24 and 23 Jun. |
+| `cancellation-watch` (`beds.yml`) | every 15 min; Nuvolau also every 5 min from 15 Dec to 15 Feb (started by cron-job.org, below) | Beds for 2 on 22 Jun (Biella) and 23 Jun (Lagazuoi, Scotoni, Col Gallina, Averau, Scoiattoli); Rifugio Nuvolau opening watch + beds on 24 and 23 Jun. |
 | `nuvolau-dense` (`nuvolau-dense.yml`) | 31 Jan 21:00 UTC to 3 Feb 00:00 UTC | Nuvolau booking form probed **once a minute** (last year's June stage opened on 1 Feb). Shares the OPENING lock, so only one OPENING alert is ever sent. |
 | Your Mac (launchd, `scripts/local_check.sh`) | at most hourly | 22 Jun: Fanes, Lavarella, Pederü, Fodara Vedla. Their booking API (Booking Südtirol) refuses GitHub's servers, so these run from your own connection. ntfy alerts only. |
 
-**GitHub can delay scheduled runs by 10 to 30 minutes at busy times** (and sometimes skips
-runs). "Every 5/15 min" is best effort. For Nuvolau, whose beds go within minutes, the
-**ANNOUNCEMENT** alert (the published opening date and time) is the one that matters: it
-lets you be online at that moment instead of relying on the OPENING alert arriving in time.
+### What starts the runs
+
+GitHub's own `schedule:` is unreliable here: in its first day public, a 15-min cron fired
+3 of ~74 times and the 4-h cron 2 of 5 (each 2.5-3.5 h late). So **cron-job.org** starts
+the workflows instead, by calling GitHub's `workflow_dispatch` API on a precise schedule
+(UTC); the checks still run on GitHub, unchanged:
+
+| cron-job.org job | Starts |
+|---|---|
+| every 15 min (:03, :18, :33, :48) | `beds.yml`, scope `all` |
+| every 5 min on the other slots, 15 Dec - 15 Feb | `beds.yml`, scope `nuvolau` (Nuvolau only) |
+| every 4 h (00:23, 04:23, ...) | `pages.yml` |
+| 31 Jan 21:00, then every 3 h on 1-2 Feb | `nuvolau-dense.yml` |
+
+Set up with `python3 scripts/setup_triggers.py` (asks, hidden, for a cron-job.org API key
+and a GitHub fine-grained token limited to this repo with "Actions: Read and write"; the
+token is stored only in the cron-job.org jobs). `--status` shows each job's last result,
+`--remove` deletes them. cron-job.org emails you if a job fails 3 times in a row.
+
+GitHub's own crons stay as a backup. A backup run that arrives soon after an external
+one skips (cancellation-watch: within 10 min; page-watch: within 3.5 h), so the huts don't
+get extra requests.
+
+Even so, a dispatched run takes ~30-60 s to start. For Nuvolau, whose beds go within
+minutes, the **ANNOUNCEMENT** alert (the published opening date and time) is still the one
+that matters: it lets you be online at that moment.
 
 ## Alerts
 

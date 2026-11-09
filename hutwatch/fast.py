@@ -1,18 +1,27 @@
 """Entry point for .github/workflows/beds.yml: cancellation watch + Nuvolau watch.
 
-The workflow fires every 15 min all year, plus extra 5-min ticks 15 Dec - 31 Jan.
-The extra ticks run only the Nuvolau checks, so the other huts stay at 15 min.
+Runs are started by an external scheduler (cron-job.org, set up by
+scripts/setup_triggers.py) through workflow_dispatch: every 15 min with scope=all, plus
+every 5 min from 15 Dec to 15 Feb with scope=nuvolau (Nuvolau only, so the other huts
+stay at 15 min). GitHub's own cron in beds.yml is only a backup: GitHub drops most
+scheduled runs, and a backup run that arrives soon after an external one does nothing.
 """
 
 from __future__ import annotations
 
 import os
 
-from . import beds, nuvolau, tracker
+from . import beds, nuvolau, state, tracker
 from .notify import Notifier
-from .redact import log
+from .redact import log, plog
 
-FULL_TICK = "*/15 * * * *"  # must match the first cron line in beds.yml
+# A backup (GitHub cron) run skips a part that ran this recently.
+BACKUP_GAP_MIN = 10
+
+
+def _ran_within(path, minutes: float) -> bool:
+    ago = state.minutes_since(state.load(path).get("last_run"))
+    return ago is not None and 0 <= ago < minutes
 
 
 def send_tests(notifier: Notifier) -> None:
@@ -40,14 +49,25 @@ def send_tests(notifier: Notifier) -> None:
 
 
 def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = None,
-        only: set[str] | None = None) -> int:
+        only: set[str] | None = None, scope: str | None = None) -> int:
+    """schedule: GitHub's cron string ($SCHEDULE) when started by GitHub's own (backup)
+    schedule, empty otherwise. scope: "all" (default) or "nuvolau" ($SCOPE)."""
     schedule = (schedule if schedule is not None else os.environ.get("SCHEDULE", "")).strip()
+    scope = (scope if scope is not None else os.environ.get("SCOPE", "")).strip() or "all"
     if test_alert:
         send_tests(notifier)
-    rows = tracker.load_or_warn()
-    beds_due = schedule in ("", FULL_TICK)  # manual run or the 15-min tick
+    beds_due = scope != "nuvolau"
+    nuv_due = not only or "nuvolau" in only
+    if schedule:  # backup run: skip what the external trigger just did
+        if beds_due and _ran_within(beds.STATE_FILE, BACKUP_GAP_MIN):
+            beds_due = False
+            plog(f"skipped hut checks: backup schedule, last run under {BACKUP_GAP_MIN} min ago")
+        if nuv_due and _ran_within(nuvolau.STATE_FILE, BACKUP_GAP_MIN):
+            nuv_due = False
+            plog(f"skipped Nuvolau checks: backup schedule, last run under {BACKUP_GAP_MIN} min ago")
+    rows = tracker.load_or_warn() if beds_due or nuv_due else []
     any_beds = beds.run(notifier, only=only, rows=rows) if beds_due else True
-    any_nuv = nuvolau.run(notifier, rows=rows) if not only or "nuvolau" in only else True
+    any_nuv = nuvolau.run(notifier, rows=rows) if nuv_due else True
     if not any_beds and not any_nuv:
         log("No night left to watch.")
         if os.environ.get("GITHUB_OUTPUT"):

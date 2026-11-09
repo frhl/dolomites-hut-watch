@@ -5,9 +5,10 @@ holds, enquiry forms, personal data or payments) and nothing that gets around bo
 protection. Results are never published: the public [STATUS.md](STATUS.md) shows only
 whether each check ran and worked.
 
-**Timing caveat:** GitHub can delay scheduled runs by 10 to 30 minutes at busy times (and
-skip some). The 5- and 15-minute schedules are best effort. For Nuvolau, the ANNOUNCEMENT
-alert (the published opening date/time) is the one that matters for being online on the day.
+**Timing:** runs are started by cron-job.org through GitHub's `workflow_dispatch` API
+(GitHub's own cron dropped ~95% of runs; it remains a backup). See the README, "What starts
+the runs". For Nuvolau, the ANNOUNCEMENT alert (the published opening date/time) is still
+the one that matters for being online on the day.
 
 ## Night of 22 June 2027 (check-in Tue 22, check-out Wed 23)
 

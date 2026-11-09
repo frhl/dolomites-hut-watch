@@ -3,6 +3,7 @@ FAILING (3 consecutive fetch failures). Runs every 4 h from .github/workflows/pa
 
 from __future__ import annotations
 
+import os
 import urllib.parse
 
 from . import detect, http, state, tracker
@@ -45,11 +46,22 @@ def open_body(h, page, matches, markers) -> str:
     return "\n".join(lines)
 
 
-def run(notifier: Notifier, test_alert: bool = False) -> int:
+# GitHub's own cron is a backup for the external trigger; it skips a run if one happened
+# this recently (the external trigger runs every 4 h; GitHub's cron arrives hours late).
+BACKUP_GAP_MIN = 210
+
+
+def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = None) -> int:
     today = state.today_rome()
     if today > STOP_AFTER:
         log(f"{today} is after {STOP_AFTER}: page watch finished, doing nothing.")
         return 0
+    schedule = (schedule if schedule is not None else os.environ.get("SCHEDULE", "")).strip()
+    if schedule and not test_alert:
+        ago = state.minutes_since((state.load(STATE_FILE).get("last_run") or {}).get("at"))
+        if ago is not None and 0 <= ago < BACKUP_GAP_MIN:
+            plog(f"skipped page checks: backup schedule, last run under {BACKUP_GAP_MIN} min ago")
+            return 0
 
     if test_alert:
         h = HUTS[0]
