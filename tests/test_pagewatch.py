@@ -63,6 +63,61 @@ class OpenDetection(unittest.TestCase):
         self.assertTrue(detect.open_matches(sentences("<p>Prenotabile dal 01/03/2027</p>")))
 
 
+class ChangeImportance(unittest.TestCase):
+    """Page-change pushes say IMPORTANT / Not important up front, and what they did."""
+
+    def ex(self, old, new):
+        return detect.explain_change(old, new)
+
+    # Real case (Sennes contact page, 12 Nov 2026): stray "/h2>" removed.
+    def test_formatting_fix_is_not_important(self):
+        c = self.ex(["Attention: Use payment button only after receiving our reservation confirmation!/h2>"],
+                    ["Attention: Use payment button only after receiving our reservation confirmation!"])
+        self.assertFalse(c.important)
+        self.assertEqual(c.label, "Not important")
+        self.assertIn("Formatting fix only", c.why)
+        self.assertIn("«confirmation!/h2>» → «confirmation!»", c.message())
+
+    # Negative controls: real edits, but nothing about 2027 or bookings opening.
+    def test_other_wording_is_not_important(self):
+        for old, new in [
+            (["Rifugio aperto da giugno a settembre."], ["Rifugio aperto da metà giugno a fine settembre."]),
+            (["Orari: 8-18"], ["Nuovo menu degustazione disponibile", "Orari: 8-18"]),
+            (["Season 2026: 20 June - 20 September"], ["Season 2026: 20 June - 27 September"]),
+            (["Prenotazioni via email."], []),
+        ]:
+            c = self.ex(old, new)
+            self.assertFalse(c.important, (old, new, c.why))
+            self.assertIn("nothing about 2027", c.why)
+            self.assertTrue(c.details)
+
+    # Positive controls: must be IMPORTANT, with the reason.
+    def test_important_changes(self):
+        cases = [
+            (["Apertura/Open : Sabato 6 giugno 2026"], ["Apertura/Open : Sabato 5 giugno 2027"], "mentions 2027"),
+            (["Le prenotazioni per il 2027 non sono ancora aperte."], ["Prenotazioni aperte! Scriveteci."],
+             "bookings are open"),
+            (["Contatti"], ["Contatti", "Bookings are now open."], "bookings are open"),
+            (["Season 2026 is over."], ["Bookings for next season: write to us from January."], "next season"),
+            (["Bookings for 2027 are not yet open."], ["Contatti"], "'not open yet' notice was removed"),
+            (["Prenotazioni dal 15 gennaio ore 9:00."], ["Prenotazioni dal 12 gennaio ore 9:00."], "booking date"),
+        ]
+        for old, new, why in cases:
+            c = self.ex(old, new)
+            self.assertTrue(c.important, (old, new, c.why))
+            self.assertEqual(c.label, "IMPORTANT")
+            self.assertIn(why, c.why)
+
+    def test_edit_shows_changed_words(self):
+        c = self.ex(["Apertura/Open : Sabato 6 giugno 2026"], ["Apertura/Open : Sabato 5 giugno 2027"])
+        self.assertIn("«6» → «5», «2026» → «2027»", c.message())
+
+    def test_message_is_capped(self):
+        c = self.ex([], [f"Prenotazione riga {i} 2026" for i in range(12)])
+        self.assertIn("(+7 more changes)", c.message())
+        self.assertLessEqual(len(c.message().splitlines()), 7)
+
+
 class Extraction(unittest.TestCase):
     def test_strips_scripts_styles_templates(self):
         html = """<html><head><style>.x{}</style><script>var a='prenota 2027';</script></head>
@@ -123,6 +178,34 @@ class RunLoop(unittest.TestCase):
         self.assertIn("piandefontana@livecom.it", body)
         self.assertIn("Prenotazione per il 28 giugno 2027", body)
         self.assertEqual(self.run_once()[1], [])                 # same text: no repeat alert
+
+    def test_change_push_title_and_priority(self):
+        self.run_once()
+        sennes = "https://www.sennes.com/en/contact/index.php"
+        pushes = []
+
+        def run_with(html):
+            self.pages[sennes] = html
+            n = FakeNotifier()
+            n.ntfy_topic = "t"
+            n.ntfy = lambda title, msg, **k: pushes.append((title, msg, k)) or True
+            pagewatch.run(n)
+
+        base = self.pages[sennes]
+        run_with("<p>Use payment button only after our reservation confirmation!/h2></p>" + base)
+        pushes.clear()
+        run_with("<p>Use payment button only after our reservation confirmation!</p>" + base)
+        self.assertEqual(len(pushes), 1)
+        title, msg, k = pushes[0]
+        self.assertEqual(title, "Not important: Sennes page changed")
+        self.assertEqual(k["priority"], 2)
+        self.assertTrue(msg.startswith("Formatting fix only"))
+        self.assertIn("Page: contact/enquiry page", msg)
+        pushes.clear()
+        run_with("<p>Prenotazioni 2027: scriveteci dal 10 gennaio.</p>" + base)
+        title, msg, k = pushes[0]
+        self.assertEqual((title, k["priority"]), ("IMPORTANT: Sennes page changed", 4))
+        self.assertTrue(msg.startswith("Why: new text mentions 2027"))
 
     def test_open_alert_is_pushed_with_email_button(self):
         self.run_once()

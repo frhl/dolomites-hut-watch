@@ -128,9 +128,12 @@ class PublicOutputIsAvailabilityBlind(unittest.TestCase):
 
         # Positive control: the EVENTS world really produced alerts of every kind.
         self.assertEqual(q_pushes, [])
+        # OPEN already covers Pian de Fontana's page: no second push for the same change.
+        self.assertNotIn("IMPORTANT: Pian de Fontana page changed", e_pushes)
+        self.assertNotIn("IMPORTANT: Nuvolau page changed", e_pushes)  # ANNOUNCEMENT covers it
         for title in ["BEDS: Rifugio Biella 22 Jun 2027", nuvolau.OPENING_TITLE,
                       "ANNOUNCEMENT: Nuvolau 2027 booking", "OPEN: Pian de Fontana 2027 bookings",
-                      "CHANGE: Pian de Fontana page"]:
+                      "IMPORTANT: Sennes page changed"]:
             self.assertIn(title, e_pushes)
 
         self.assertEqual(q_log, e_log)

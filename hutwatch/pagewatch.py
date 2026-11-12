@@ -46,6 +46,15 @@ def open_body(h, page, matches, markers) -> str:
     return "\n".join(lines)
 
 
+def change_push(hut_name: str, page, ch: "detect.Change") -> dict:
+    """Push for a page change: the title says IMPORTANT / Not important up front, the text
+    says why and what they did. Not important = priority 2 (quiet), IMPORTANT = 4."""
+    return {"title": f"{ch.label}: {hut_name} page changed",
+            "msg": f"{ch.message()}\nPage: {page.label}",
+            "priority": 4 if ch.important else 2,
+            "tags": ["warning"] if ch.important else ["pencil"]}
+
+
 # GitHub's own cron is a backup for the external trigger; it skips a run if one happened
 # this recently (the external trigger runs every 4 h; GitHub's cron arrives hours late).
 BACKUP_GAP_MIN = 210
@@ -95,7 +104,8 @@ def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = Non
         new = dict(old)
         new["url"] = page.url
         new["last_checked"] = t
-        events: list[tuple[str, str, bool]] = []  # (title, body, comment_only)
+        # (issue title, issue body, comment_only, push override: {title, msg, priority, tags} or None)
+        events: list[tuple[str, str, bool, dict | None]] = []
 
         try:
             resp = http.request("GET", page.url)
@@ -108,24 +118,27 @@ def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = Non
             if n >= FAIL_THRESHOLD and not old.get("failure_alerted"):
                 events.append((f"FAILING: {h.name} monitor",
                                f"**{page.label}** {page.url} failed {n} runs in a row.\n\n"
-                               f"Last error: `{e}`\n\nThe monitor keeps trying every run.", False))
+                               f"Last error: `{e}`\n\nThe monitor keeps trying every run.", False, None))
                 new["failure_alerted"] = True
             summary.append(f"{page.id}: FAIL ({n}x) {e}")
             plog(f"checked {page.id}: FAIL ({reason(e)})")
         else:
             if old.get("failure_alerted"):
                 events.append((f"FAILING: {h.name} monitor",
-                               f"Recovered: {page.url} fetched OK again.", True))
+                               f"Recovered: {page.url} fetched OK again.", True, None))
             new.update(last_status=f"ok (HTTP {resp.status})", consecutive_failures=0,
                        failure_alerted=False, last_success=t)
 
             relevant = detect.relevant_sentences(ex.sentences)
             hsh = detect.digest(relevant)
             if old.get("hash") and old["hash"] != hsh:
+                ch = detect.explain_change(old.get("sentences", []), relevant)
                 events.append((f"CHANGE: {h.name} page",
+                               f"**{ch.label}.** {ch.message(max_lines=20)}\n\n"
                                f"**Hut:** Rifugio {h.name}  \n**Page:** {page.label}: {page.url}\n\n"
-                               "Booking-relevant text changed since the last run:\n\n"
-                               f"```diff\n{detect.diff(old.get('sentences', []), relevant)}\n```", False))
+                               "Booking-relevant text, before and after:\n\n"
+                               f"```diff\n{detect.diff(old.get('sentences', []), relevant)}\n```", False,
+                               change_push(h.name, page, ch)))
                 new["last_changed"] = t
             new["hash"], new["sentences"] = hsh, relevant
 
@@ -135,7 +148,10 @@ def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = Non
                 markers = ex.widget_markers if not old.get("widget_markers") else []
                 if fresh or markers:
                     events.append((f"OPEN: {h.name} 2027 bookings",
-                                   open_body(h, page, fresh, markers), False))
+                                   open_body(h, page, fresh, markers), False, None))
+                    # The OPEN push already covers this page: no second push for the change.
+                    events = [(a, b, c, {"skip": True} if a.startswith("CHANGE:") else d)
+                              for a, b, c, d in events]
                 new["open_matches"] = matches
             new["widget_markers"] = ex.widget_markers
             plog(f"checked {page.id}: ok")
@@ -143,21 +159,25 @@ def run(notifier: Notifier, test_alert: bool = False, schedule: str | None = Non
                            + (", CHANGED" if new.get("last_changed") == t else ""))
 
         delivered = True
-        for title, body, comment_only in events:
-            if not comment_only:
+        for title, body, comment_only, push in events:
+            if not comment_only and not (push or {}).get("skip"):
                 # Push (the only channel when issues are off): short text + tap to the page;
                 # OPEN alerts get an "Email hut" button pre-filled with the booking email.
                 kind = title.split(":", 1)[0]
                 first = next((ln[2:] for ln in body.splitlines() if ln.startswith("> ")), "")
-                msg = (first or body.split("\n\n")[0]).replace("**", "")[:300]
+                push = push or {
+                    "title": title,
+                    "msg": (first or body.split("\n\n")[0]).replace("**", "")[:300],
+                    "priority": {"OPEN": 4}.get(kind, 3),
+                    "tags": {"OPEN": ["tada"]}.get(kind, ["warning"]),
+                }
                 extra = ([{"action": "view", "label": "Email hut", "url": mailto_link(h.email_to)}]
                          if kind == "OPEN" and h.email_to else None)
-                pushed = notifier.ntfy(title, msg, priority={"OPEN": 4}.get(kind, 3), click=page.url,
-                                       tags={"OPEN": ["tada"], "CHANGE": ["pencil"]}.get(kind, ["warning"]),
-                                       extra_actions=extra)
+                pushed = notifier.ntfy(push["title"], push["msg"], priority=push["priority"], click=page.url,
+                                       tags=push["tags"], extra_actions=extra)
                 if notifier.ntfy_topic and not pushed:
                     delivered = False
-                notifier.telegram(f"{title}\n{page.url}")
+                notifier.telegram(f"{push['title']}\n{page.url}")
             try:
                 notifier.issue(title, body, comment_only=comment_only)
             except Exception as e:  # noqa: BLE001

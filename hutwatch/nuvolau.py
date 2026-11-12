@@ -120,7 +120,8 @@ def check_announcements(st: dict, notifier: Notifier, summary: list[str]) -> Non
         _ok(rec, "announcement watch", notifier)
 
         matches = detect.announcement_matches(ex.sentences)
-        fresh = [m for m in matches if m not in rec.get("matches", []) and m not in pushed_this_run]
+        new_matches = [m for m in matches if m not in rec.get("matches", [])]
+        fresh = [m for m in new_matches if m not in pushed_this_run]
         pushed_this_run.update(fresh)
         if fresh:
             whens = [w for m in fresh for w in detect.when_mentions(m)]
@@ -142,10 +143,15 @@ def check_announcements(st: dict, notifier: Notifier, summary: list[str]) -> Non
         relevant = detect.relevant_sentences(ex.sentences)
         h = detect.digest(relevant)
         if not first and rec.get("hash") != h:
-            notifier.ntfy("CHANGE: Nuvolau page", f"Booking-relevant text changed on {url}",
-                          priority=2, click=url, tags=["pencil"])
+            ch = detect.explain_change(rec.get("sentences", []), relevant)
+            # No second push when this page's new text was just pushed as an ANNOUNCEMENT.
+            if not any(m in pushed_this_run for m in new_matches):
+                notifier.ntfy(f"{ch.label}: Nuvolau page changed", f"{ch.message()}\nPage: {url}",
+                              priority=4 if ch.important else 2, click=url,
+                              tags=["warning"] if ch.important else ["pencil"])
             _issue(notifier, "CHANGE: Nuvolau page",
-                           f"**Page:** {url}\n\n```diff\n{detect.diff(rec.get('sentences', []), relevant)}\n```")
+                           f"**{ch.label}.** {ch.message(max_lines=20)}\n\n**Page:** {url}\n\n"
+                           f"```diff\n{detect.diff(rec.get('sentences', []), relevant)}\n```")
         rec["hash"], rec["sentences"] = h, relevant
         summary.append(f"announce {url}: ok, {len(matches)} announcement sentence(s)")
         plog(f"checked Nuvolau page {url}: ok")

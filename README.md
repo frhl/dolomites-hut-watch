@@ -69,7 +69,8 @@ that matters: it lets you be online at that moment.
 | `ANNOUNCEMENT: Nuvolau 2027 booking` | Nuvolau pages announce the opening date/time | ntfy p5 if a date/time is in the text (else p4), issue with the matched text |
 | `NUVOLAU 2027 BOOKING IS OPEN` | Nuvolau's booking calendar goes live for any date | ntfy p5 (urgent) x3, 1 min apart, tap opens the booking form; issue |
 | `OPEN: <hut> 2027 bookings` | 28 Jun huts: page mentions 2027 with booking language (negatives like "non ancora" ignored) or the CAI booking calendar appears | ntfy p4 with an **Email hut** button (pre-filled booking email; add your name), issue if on |
-| `CHANGE: <hut> page` | Booking-relevant text changed | ntfy p3 (Nuvolau p2), issue with before/after diff if on |
+| `IMPORTANT: <hut> page changed` | Booking-relevant text changed and the new text mentions 2027, says bookings are open or next season, gives a booking date, or a "not open yet" notice disappeared | ntfy p4. Text: why, then what they did (`«old» → «new»`, `New: …`, `Gone: …`). No extra push when an OPEN/ANNOUNCEMENT push already covers it. |
+| `Not important: <hut> page changed` | Any other change: formatting fixes (same words) or other wording | ntfy p2 (quiet), same layout |
 | `FAILING: ...` | 3 consecutive failures of any check | ntfy p3, issue if on; "Recovered" note later (issue only) |
 
 Every alert goes to ntfy. GitHub issues are **off** (repository variable `HUTWATCH_ISSUES=off`,
